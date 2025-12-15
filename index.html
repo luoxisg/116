@@ -562,15 +562,15 @@
             });
         });
 
-        // --- 6. 照片墙逻辑 (严格集成 GitHub 仓库) ---
+        // --- 6. 照片墙逻辑 (严格集成 GitHub 仓库 - 增强版) ---
         
         const repoUser = 'luoxisg';
         const repoName = '116';
         const repoBranch = 'main';
         const repoFolder = 'image';
         
-        // 构建 jsDelivr CDN 基础路径
         const repoBaseUrl = `https://cdn.jsdelivr.net/gh/${repoUser}/${repoName}@${repoBranch}/${repoFolder}/`;
+        const photosJsUrl = repoBaseUrl + 'photos.js?v=' + Date.now(); // 防止缓存
 
         const photoGrid = document.getElementById("photoGrid");
         const viewer = document.getElementById("viewer");
@@ -588,11 +588,11 @@
 
         // 渲染函数
         function renderPhotos(photoList) {
-            loadingDiv.style.display = 'none'; // 隐藏 Loading
-            photoGrid.innerHTML = ''; // 清空
+            loadingDiv.style.display = 'none'; 
+            photoGrid.innerHTML = ''; 
             
             if(!photoList || photoList.length === 0) {
-                showStatus("GitHub 仓库中暂无照片配置，请检查 photos.js", "error");
+                showStatus("GitHub 仓库中暂无照片配置", "error");
                 return;
             }
 
@@ -602,7 +602,6 @@
                 const div = document.createElement("div");
                 div.className = "relative group overflow-hidden rounded-xl border border-white/10 cursor-pointer bg-white/5";
                 
-                // 判断是否为完整 URL
                 const src = name.startsWith('http') ? name : (repoBaseUrl + name);
                 
                 const img = document.createElement("img");
@@ -610,9 +609,7 @@
                 img.className = "w-full h-40 md:h-48 object-cover transition-transform duration-500 group-hover:scale-110 opacity-80 group-hover:opacity-100";
                 img.loading = "lazy";
                 
-                // 错误处理：不再显示占位图，而是显示错误图标
                 img.onerror = function() {
-                    // 替换为错误提示
                     this.style.display = 'none';
                     const errDiv = document.createElement('div');
                     errDiv.className = "w-full h-40 md:h-48 flex items-center justify-center bg-gray-900 text-gray-500 flex-col";
@@ -620,13 +617,11 @@
                     div.appendChild(errDiv);
                 };
 
-                // 点击查看大图
                 div.onclick = () => {
                     viewerImg.src = src;
                     viewer.style.display = "flex";
                 };
                 
-                // 装饰性遮罩
                 const overlay = document.createElement("div");
                 overlay.className = "absolute inset-0 bg-black/50 group-hover:bg-transparent transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100";
                 overlay.innerHTML = '<i class="fas fa-search-plus text-white/80 text-2xl drop-shadow-md"></i>';
@@ -637,53 +632,84 @@
             });
         }
 
-        // 尝试加载远程 photos.js
-        const script = document.createElement('script');
-        script.crossOrigin = "anonymous"; 
-        // 添加时间戳防止缓存
-        script.src = repoBaseUrl + 'photos.js?v=' + Date.now();
-
-        // 5秒超时
-        const loadTimeout = setTimeout(() => {
-            loadingDiv.innerHTML = '<span class="text-red-500">连接超时：无法从 GitHub 加载数据。<br>请检查网络或确认仓库路径正确。</span>';
-            showStatus("连接 GitHub 超时", "error");
-        }, 5000);
-
-        script.onload = () => {
-            clearTimeout(loadTimeout);
-            console.log("GitHub photos.js loaded.");
+        // 核心修复：直接 Fetch 文件内容，而不是作为脚本执行
+        // 这样可以避免 window.photos 未定义的问题，也可以避免 JSON 格式错误
+        async function loadPhotosFromGithub() {
             try {
-                // 假设 photos.js 中定义了全局变量 photos = [...]
-                if (typeof photos !== 'undefined' && Array.isArray(photos)) {
-                    renderPhotos(photos);
-                } else {
-                    loadingDiv.style.display = 'none';
-                    showStatus("错误：photos.js 已加载但未找到 photos 数组", "error");
+                console.log("Fetching photos.js from:", photosJsUrl);
+                const response = await fetch(photosJsUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
+                
+                const text = await response.text();
+                // 1. 先尝试移除所有类型的注释
+                const cleanedText = text
+                    .replace(/\/\*[\s\S]*?\*\//g, '') // 移除 /* ... */
+                    .replace(/\/\/.*/g, '');           // 移除 // ...
+
+                // 2. 尝试提取数组部分
+                // 寻找最外层的 [ ... ]
+                // 注意：这里需要处理多行的情况，[\s\S] 可以匹配换行
+                const match = cleanedText.match(/\[([\s\S]*?)\]/);
+                
+                if (match && match[0]) {
+                    // 3. 尝试解析
+                    // 方案A：如果是标准JSON，直接parse
+                    try {
+                        const photos = JSON.parse(match[0]);
+                        renderPhotos(photos);
+                        return;
+                    } catch(e) {
+                        console.log("JSON parse failed, trying relaxed parsing...");
+                    }
+
+                    // 方案B：宽松解析 (处理单引号、尾随逗号等)
+                    // 使用 Function 构造器来安全地评估数组字面量
+                    // 前提是内容基本是数组格式
+                    try {
+                        const photoArray = new Function("return " + match[0])();
+                        if(Array.isArray(photoArray)) {
+                            renderPhotos(photoArray);
+                            return;
+                        }
+                    } catch(e) {
+                        console.warn("Function eval failed:", e);
+                    }
+                } 
+                
+                // 4. 终极兜底方案：如果上述都失败了，直接正则提取所有文件名字符串
+                // 匹配引号内的 .jpg/.png 等文件
+                const fileMatches = cleanedText.match(/['"]([^'"]+\.(jpg|jpeg|png|gif|webp))['"]/gi);
+                if (fileMatches && fileMatches.length > 0) {
+                    // 清理引号
+                    const photos = fileMatches.map(s => s.replace(/['"]/g, ''));
+                    console.log("Extracted photos via regex fallback:", photos);
+                    renderPhotos(photos);
+                    return;
+                }
+
+                throw new Error("Could not parse photo array from file");
+
             } catch (e) {
+                console.error("Failed to load photos:", e);
                 loadingDiv.style.display = 'none';
-                console.error("Error processing photos list:", e);
-                showStatus("数据解析错误", "error");
+                
+                // 错误提示UI
+                photoGrid.innerHTML = `
+                    <div class="col-span-full bg-red-900/20 border border-red-500/50 rounded p-6 text-center">
+                        <h3 class="text-red-400 font-bold text-lg mb-2"><i class="fas fa-exclamation-triangle"></i> 加载失败</h3>
+                        <p class="text-gray-400 text-sm mb-4">无法读取照片配置文件</p>
+                        <p class="text-gray-500 text-xs font-mono bg-black/30 p-2 rounded">${e.message}</p>
+                    </div>
+                `;
             }
-        };
+        }
 
-        script.onerror = () => {
-            clearTimeout(loadTimeout);
-            loadingDiv.style.display = 'none';
-            console.log("Could not load photos.js from GitHub.");
-            
-            // 显示具体的错误指导
-            photoGrid.innerHTML = `
-                <div class="col-span-full bg-red-900/20 border border-red-500/50 rounded p-6 text-center">
-                    <h3 class="text-red-400 font-bold text-lg mb-2"><i class="fas fa-exclamation-triangle"></i> 无法加载相册配置</h3>
-                    <p class="text-gray-400 text-sm mb-4">未能找到 GitHub 仓库中的配置文件：<br>
-                    <code class="bg-black/30 px-2 py-1 rounded text-xs mt-2 inline-block font-mono text-blue-300">luoxisg/116/main/image/photos.js</code></p>
-                    <p class="text-gray-500 text-xs">请确认：<br>1. 文件已上传且命名正确<br>2. 文件内容格式为：photos = ["1.jpg", "2.jpg"];</p>
-                </div>
-            `;
-        };
+        // 启动加载
+        loadPhotosFromGithub();
 
-        document.body.appendChild(script);
     </script>
 </body>
 </html>
