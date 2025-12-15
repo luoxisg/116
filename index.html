@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -163,6 +163,42 @@
             border: 1px solid rgba(255,255,255,0.1);
         }
 
+        /* 自定义置顶评论样式 */
+        .pinned-comment {
+            background: linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(255,105,180,0.1) 100%);
+            border: 1px solid rgba(255,215,0,0.3);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border-radius: 12px;
+            position: relative;
+        }
+        .pinned-comment::before {
+            content: '\f08d'; /* font-awesome pin icon */
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            color: #ffd700;
+            font-size: 1.5rem;
+            transform: rotate(45deg);
+            filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
+        }
+        .pinned-comment p {
+            margin-bottom: 0.5rem;
+            color: #e2e8f0;
+            line-height: 1.8;
+        }
+        .pinned-signature {
+            text-align: right;
+            font-size: 0.85rem;
+            color: #94a3b8;
+            font-family: monospace;
+            margin-top: 1rem;
+            border-top: 1px dashed rgba(255,255,255,0.1);
+            padding-top: 0.5rem;
+        }
+
         /* 响应式调整 */
         @media (max-width: 768px) {
             .timeline-line { left: 20px; }
@@ -209,10 +245,18 @@
             <h1 class="glitch font-retro" data-text="青春无悔">青春无悔</h1>
         </div>
         
-        <p class="text-xl md:text-2xl text-gray-300 font-light mb-8 max-w-2xl leading-relaxed">
-            有些名字，一辈子都不会忘<br>
-            <span class="text-sm opacity-60 mt-4 block font-mono text-blue-400">Loading memories... 100%</span>
-        </p>
+        <!-- 【第一条】感性文案 -->
+        <div class="text-lg md:text-xl text-gray-300 font-light mb-12 max-w-2xl leading-relaxed space-y-4">
+            <p>看到这个页面，突然就明白了什么叫<span class="text-blue-400 font-bold">“时间真的走了”</span>。</p>
+            <p>谢谢把 116 班留在这里的人，</p>
+            <p>不管以后来多少次，</p>
+            <p class="text-yellow-200">都算我们又在同一个教室里坐了一会儿。</p>
+            
+            <div class="mt-8 text-sm opacity-60 font-mono text-right border-t border-white/10 pt-4 inline-block w-full">
+                <!-- 删除了"署名可选："这几个字 -->
+                <p>路过的同桌</p>
+            </div>
+        </div>
 
         <div class="flex flex-col md:flex-row gap-4 items-center z-10">
             <a href="#music-memory" class="neon-btn rounded cursor-pointer group w-40 text-center">
@@ -322,8 +366,22 @@
                 <div class="relative z-10">
                     <h2 class="text-center text-3xl font-retro text-pink-500 mb-8">💬 给 116 班留一句话</h2>
                     
-                    <!-- Waline 容器 -->
-                    <div id="waline"></div>
+                    <!-- Waline 容器 - 确保此元素存在 -->
+                    <div id="waline-wrapper">
+                        <!-- 置顶评论将插入到这里 -->
+                        <div class="pinned-comment">
+                            <p>看到这个页面，突然就明白了什么叫<span style="color:#60a5fa;font-weight:bold;">“时间真的走了”</span>。</p>
+                            <p>谢谢把 116 班留在这里的人，</p>
+                            <p>不管以后来多少次，</p>
+                            <p style="color:#fde047;">都算我们又在同一个教室里坐了一会儿。</p>
+                            <div class="pinned-signature">
+                                <!-- 删除了"署名可选："这几个字 -->
+                                路过的同桌
+                            </div>
+                        </div>
+                        
+                        <div id="waline"></div>
+                    </div>
                 </div>
             </div>
 
@@ -366,7 +424,7 @@
         </div>
     </footer>
 
-    <!-- 全屏查看器 (来自 bbs.html) -->
+    <!-- 全屏查看器 -->
     <div id="viewer" onclick="this.style.display='none'">
         <img id="viewerImg" src="" alt="Full View">
     </div>
@@ -382,23 +440,50 @@
         </div>
     </a>
 
-    <!-- Waline 初始化 (Module 模式) -->
+    <!-- Waline 初始化 (Module 模式 + 安全加载) -->
     <script type="module">
         import { init } from 'https://unpkg.com/@waline/client@v3/dist/waline.js';
 
-        init({
-            el: '#waline',
-            serverURL: 'https://waline.vercel.app', // 请替换为你自己的地址
-            lang: 'zh-CN',
-            placeholder: '写下一句想对同学说的话...',
-            dark: true, 
-            reaction: ['❤️', '👍', '😎', '😂'], // 修复：使用 Emoji 字符代替不稳定的图片链接
-            emoji: [
-                'https://unpkg.com/@waline/emojis@1.2.0/weibo',
-                'https://unpkg.com/@waline/emojis@1.2.0/bilibili',
-                'https://unpkg.com/@waline/emojis@1.2.0/tieba',
-            ]
-        });
+        // 确保 DOM 准备好后再初始化，防止 'el' 找不到元素
+        function initWaline() {
+            const el = document.getElementById('waline');
+            if (!el) {
+                console.warn('Waline element not found yet, retrying...');
+                setTimeout(initWaline, 500); // 没找到就500毫秒后重试
+                return;
+            }
+
+            init({
+                el: el, // 直接传递 DOM 元素对象，最稳妥
+                serverURL: 'https://waline.vercel.app', // 请替换为你自己的地址
+                lang: 'zh-CN',
+                placeholder: `看到这个页面，突然就明白了什么叫“时间真的走了”。
+
+谢谢把 116 班留在这里的人，
+
+不管以后来多少次，
+
+都算我们又在同一个教室里坐了一会儿。
+
+---
+署名可选：
+路过的同桌`,
+                dark: true, 
+                reaction: ['❤️', '👍', '😎', '😂'], 
+                emoji: [
+                    'https://unpkg.com/@waline/emojis@1.2.0/weibo',
+                    'https://unpkg.com/@waline/emojis@1.2.0/bilibili',
+                    'https://unpkg.com/@waline/emojis@1.2.0/tieba',
+                ]
+            });
+        }
+
+        // 尝试初始化
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initWaline);
+        } else {
+            initWaline();
+        }
     </script>
 
     <!-- Main Logic Script -->
@@ -632,7 +717,6 @@
         }
 
         // 核心修复：直接 Fetch 文件内容，而不是作为脚本执行
-        // 这样可以避免 window.photos 未定义的问题，也可以避免 JSON 格式错误
         async function loadPhotosFromGithub() {
             try {
                 console.log("Fetching photos.js from:", photosJsUrl);
