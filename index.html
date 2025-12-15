@@ -253,7 +253,7 @@
             <p class="text-yellow-200">都算我们又在同一个教室里坐了一会儿。</p>
             
             <div class="mt-8 text-sm opacity-60 font-mono text-right border-t border-white/10 pt-4 inline-block w-full">
-                <!-- 删除了"署名可选："这几个字 -->
+                <!-- 移除了"署名可选："前缀 -->
                 <p>路过的同桌</p>
             </div>
         </div>
@@ -469,11 +469,13 @@
 署名可选：
 路过的同桌`,
                 dark: true, 
+                // 使用 Unicode Emoji 解决图片加载失败问题
                 reaction: ['❤️', '👍', '😎', '😂'], 
+                // 使用 jsDelivr 替换 unpkg 提高稳定性
                 emoji: [
-                    'https://unpkg.com/@waline/emojis@1.2.0/weibo',
-                    'https://unpkg.com/@waline/emojis@1.2.0/bilibili',
-                    'https://unpkg.com/@waline/emojis@1.2.0/tieba',
+                    'https://cdn.jsdelivr.net/npm/@waline/emojis@1.2.0/weibo',
+                    'https://cdn.jsdelivr.net/npm/@waline/emojis@1.2.0/bilibili',
+                    'https://cdn.jsdelivr.net/npm/@waline/emojis@1.2.0/tieba',
                 ]
             });
         }
@@ -717,6 +719,7 @@
         }
 
         // 核心修复：直接 Fetch 文件内容，而不是作为脚本执行
+        // 这样可以避免 window.photos 未定义的问题，也可以避免 JSON 格式错误
         async function loadPhotosFromGithub() {
             try {
                 console.log("Fetching photos.js from:", photosJsUrl);
