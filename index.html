@@ -1,11 +1,14 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>116班 · 青春时光机 | 12.20 主题班会</title>
+    <title>116班 · 青春时光机 | 永远的我们</title>
+    <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入图标库 -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- 引入字体 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;700&family=Orbitron:wght@500;900&display=swap" rel="stylesheet">
@@ -25,6 +28,7 @@
             font-family: 'Noto Serif SC', serif;
             overflow-x: hidden;
             margin: 0;
+            scroll-behavior: smooth;
         }
 
         /* 动态背景 Canvas */
@@ -39,17 +43,11 @@
         }
 
         /* 字体风格 */
-        .font-retro {
-            font-family: 'Ma Shan Zheng', cursive;
-        }
-        .font-tech {
-            font-family: 'Orbitron', sans-serif;
-        }
+        .font-retro { font-family: 'Ma Shan Zheng', cursive; }
+        .font-tech { font-family: 'Orbitron', sans-serif; }
 
         /* 故障艺术标题 (Glitch Effect) */
-        .glitch-wrapper {
-            position: relative;
-        }
+        .glitch-wrapper { position: relative; }
         .glitch {
             position: relative;
             color: #fff;
@@ -87,7 +85,11 @@
             border-radius: 16px;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             transform-style: preserve-3d;
-            opacity: 0; /* 初始隐藏，JS控制显示 */
+        }
+        
+        /* 时间轴卡片特定样式 */
+        .timeline-card {
+            opacity: 0;
             transform: translateY(50px);
         }
 
@@ -96,12 +98,6 @@
             border-color: var(--neon-gold);
             box-shadow: 0 10px 30px -10px rgba(255, 215, 0, 0.3);
             background: rgba(255, 255, 255, 0.1);
-        }
-
-        .card-number {
-            font-family: 'Orbitron', sans-serif;
-            -webkit-text-stroke: 1px rgba(255,255,255,0.3);
-            color: transparent;
         }
 
         /* 霓虹按钮 */
@@ -118,6 +114,7 @@
             transition: 0.2s;
             border: 1px solid var(--neon-blue);
             font-family: 'Orbitron', sans-serif;
+            z-index: 10;
         }
         .neon-btn:hover {
             color: #111;
@@ -137,21 +134,6 @@
             z-index: 9999;
         }
 
-        /* 滚动条美化 */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0f172a;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #334155;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--neon-gold);
-        }
-
         /* 响应式调整 */
         @media (max-width: 768px) {
             .timeline-line { left: 20px; }
@@ -163,27 +145,16 @@
             .timeline-item.left .memory-card { margin-left: 0; }
         }
         
-        .visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* 音乐播放器黑胶动画 */
-        .vinyl-spin {
-            animation: spin 4s linear infinite;
-        }
-        .vinyl-paused {
-            animation-play-state: paused;
-        }
+        .visible { opacity: 1; transform: translateY(0); }
+        .vinyl-spin { animation: spin 4s linear infinite; }
+        .vinyl-paused { animation-play-state: paused; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
-
     </style>
 </head>
 <body>
 
     <!-- 噪音纹理 -->
     <div class="grain-overlay"></div>
-    
     <!-- 粒子背景 -->
     <canvas id="memory-canvas"></canvas>
 
@@ -191,7 +162,9 @@
     <nav class="fixed top-0 w-full z-50 bg-black/30 backdrop-blur-md border-b border-white/10">
         <div class="container mx-auto px-6 py-3 flex justify-between items-center">
             <div class="text-xl font-bold font-retro text-yellow-500 tracking-widest">116班</div>
-            <div class="font-tech text-xs text-blue-300 animate-pulse">SYSTEM: ONLINE // 12.20.2025</div>
+            <div class="font-tech text-xs text-blue-300 animate-pulse hidden md:block">SYSTEM: ONLINE // REUNION</div>
+            <!-- 移动端简易菜单占位 -->
+            <div class="md:hidden text-white cursor-pointer"><i class="fas fa-bars"></i></div>
         </div>
     </nav>
 
@@ -199,102 +172,148 @@
     <header class="min-h-screen flex flex-col items-center justify-center relative px-4 text-center">
         <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#0f172a]"></div>
         
-        <div class="mb-4 inline-block px-4 py-1 border border-yellow-500/50 rounded-full bg-yellow-500/10 backdrop-blur text-yellow-300 text-sm tracking-[0.2em] uppercase">
+        <div class="mb-6 inline-block px-4 py-1 border border-yellow-500/50 rounded-full bg-yellow-500/10 backdrop-blur text-yellow-300 text-sm tracking-[0.2em] uppercase">
             Class Reunion Protocol
         </div>
         
-        <div class="glitch-wrapper mb-8">
+        <div class="glitch-wrapper mb-6">
             <h1 class="glitch font-retro" data-text="青春无悔">青春无悔</h1>
         </div>
         
-        <p class="text-xl md:text-2xl text-gray-300 font-light mb-12 max-w-2xl leading-relaxed">
-            <span class="text-blue-400 font-bold">12月20日</span> · 一场关于时光的旅行<br>
-            <span class="text-sm opacity-60 mt-2 block font-mono">Loading memories... 100%</span>
+        <p class="text-xl md:text-2xl text-gray-300 font-light mb-8 max-w-2xl leading-relaxed">
+            有些名字，一辈子都不会忘<br>
+            <span class="text-sm opacity-60 mt-4 block font-mono text-blue-400">Loading memories... 100%</span>
         </p>
 
-        <a href="#timeline-start" class="neon-btn rounded cursor-pointer group">
-            <i class="fas fa-play mr-2 group-hover:animate-ping"></i> 开启时光机
-        </a>
+        <div class="flex flex-col md:flex-row gap-4 items-center z-10">
+            <a href="#music-memory" class="neon-btn rounded cursor-pointer group w-40 text-center">
+                <i class="fas fa-music mr-2"></i> 聆听
+            </a>
+            <a href="#timeline-start" class="neon-btn rounded cursor-pointer group w-40 text-center" style="border-color: var(--neon-gold); color: var(--neon-gold);">
+                <i class="fas fa-play mr-2"></i> 启程
+            </a>
+        </div>
 
         <div class="absolute bottom-10 animate-bounce text-gray-500">
             <i class="fas fa-chevron-down text-2xl"></i>
         </div>
     </header>
 
+    <!-- 音乐记忆剧场 (融合自 gydgs.html) -->
+    <section id="music-memory" class="relative py-24 px-4">
+        <div class="container mx-auto max-w-4xl">
+            <!-- 装饰性标题 -->
+            <div class="text-center mb-12 relative">
+                 <div class="absolute top-1/2 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+                 <span class="bg-[#0f172a] px-4 relative text-yellow-500 font-retro text-2xl">记忆剧场</span>
+            </div>
+
+            <div class="memory-card p-4 md:p-10 rounded-2xl border border-white/10 shadow-2xl relative z-10 bg-black/40">
+                <div class="text-center mb-8">
+                    <p class="text-blue-400 tracking-[0.3em] text-xs uppercase mb-2 font-tech">1990s · Memory Log</p>
+                    <h2 class="text-3xl md:text-4xl font-retro text-white mb-4">光阴的故事</h2>
+                    <p class="text-gray-400 font-light italic max-w-lg mx-auto">"这首歌一响起，我们就不再是现在的年纪了。"</p>
+                </div>
+
+                <!-- Bilibili 播放器容器 -->
+                <div class="relative w-full pt-[56.25%] rounded-xl overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.6)] border border-white/5 bg-black group">
+                    <iframe
+                        class="absolute inset-0 w-full h-full"
+                        src="https://player.bilibili.com/player.html?bvid=BV1sV411M7cY&autoplay=0&high_quality=1&danmaku=0"
+                        allowfullscreen="allowfullscreen"
+                        width="100%"
+                        height="100%"
+                        scrolling="no"
+                        frameborder="0"
+                        sandbox="allow-top-navigation allow-same-origin allow-forms allow-scripts">
+                    </iframe>
+                </div>
+                
+                <div class="text-center mt-8">
+                    <a href="https://www.bilibili.com/video/BV1sV411M7cY" target="_blank" class="text-xs text-blue-400 hover:text-blue-300 transition flex items-center justify-center gap-2 opacity-70 hover:opacity-100">
+                        <i class="fab fa-bilibili"></i> 若播放器加载失败，点击此处前往 B 站播放
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- 流程时间轴 -->
     <section id="timeline-start" class="relative py-20 px-4 container mx-auto max-w-5xl">
+        <h2 class="text-center text-4xl font-retro text-white mb-20 relative z-10">
+            <span class="relative inline-block">
+                12.20 活动流程
+                <span class="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-transparent via-yellow-500 to-transparent"></span>
+            </span>
+        </h2>
+        
         <div class="timeline-line"></div>
 
         <!-- 流程数据注入区 -->
         <div id="timeline-content">
-            <!-- Items will be generated by JS based on your CSV data -->
+            <!-- Items will be generated by JS -->
         </div>
-
     </section>
 
     <!-- 底部区域 -->
     <footer class="py-20 text-center relative overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
         <h2 class="text-3xl font-retro text-yellow-500 mb-6">永远的116</h2>
-        <p class="text-gray-400 mb-8 max-w-md mx-auto">无论时光如何流转，此刻的欢聚即是永恒。<br>愿我们出走半生，归来仍是少年。</p>
-        <div class="flex justify-center space-x-4">
-            <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center hover:bg-yellow-500 hover:text-black transition-colors cursor-pointer">
+        <p class="text-gray-400 mb-8 max-w-md mx-auto px-4">无论时光如何流转，此刻的欢聚即是永恒。<br>愿我们出走半生，归来仍是少年。</p>
+        <div class="flex justify-center space-x-6 relative z-10">
+            <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center hover:bg-yellow-500 hover:text-black transition-all transform hover:scale-110 cursor-pointer text-white">
                 <i class="fas fa-camera"></i>
             </div>
-            <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center hover:bg-blue-500 hover:text-black transition-colors cursor-pointer">
+            <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center hover:bg-blue-500 hover:text-black transition-all transform hover:scale-110 cursor-pointer text-white">
                 <i class="fas fa-music"></i>
             </div>
-            <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center hover:bg-pink-500 hover:text-black transition-colors cursor-pointer">
+            <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center hover:bg-pink-500 hover:text-black transition-all transform hover:scale-110 cursor-pointer text-white">
                 <i class="fas fa-heart"></i>
             </div>
         </div>
         <div class="mt-12 text-xs text-gray-600 font-mono">
-            SYSTEM END // LOG SAVED
+            SYSTEM END // LOG SAVED // 116 CLASS
         </div>
     </footer>
 
-    <!-- 悬浮音乐控制 (装饰性) -->
-    <div class="fixed bottom-6 right-6 z-50 flex items-center bg-black/60 backdrop-blur border border-white/20 rounded-full px-4 py-2 shadow-2xl">
+    <!-- 悬浮装饰按钮 (点击滚动到视频区) -->
+    <a href="#music-memory" class="fixed bottom-6 right-6 z-50 flex items-center bg-black/60 backdrop-blur border border-white/20 rounded-full px-4 py-2 shadow-2xl cursor-pointer hover:bg-white/10 transition group no-underline">
         <div class="w-8 h-8 rounded-full bg-gray-800 border border-gray-600 flex items-center justify-center overflow-hidden mr-3">
-             <i class="fas fa-compact-disc text-gray-400 text-lg vinyl-spin" id="music-icon"></i>
+             <i class="fas fa-compact-disc text-gray-400 text-lg vinyl-spin group-hover:text-yellow-400"></i>
         </div>
-        <div class="flex flex-col mr-4">
+        <div class="flex flex-col mr-2">
             <span class="text-xs text-yellow-500 font-bold">光阴的故事</span>
-            <span class="text-[10px] text-gray-400">正在播放...</span>
+            <span class="text-[10px] text-gray-400 group-hover:text-white transition-colors">点击播放</span>
         </div>
-        <button onclick="toggleMusic()" class="text-white hover:text-yellow-400 transition">
-            <i class="fas fa-pause" id="play-btn"></i>
-        </button>
-    </div>
+    </a>
 
     <script>
-        // --- 1. 数据配置 (严格基于 CSV 全部24项内容) ---
+        // --- 1. 数据配置 (24项完整流程) ---
         const scheduleData = [
             { id: 1, keyword: "签到", title: "记忆重启", content: "每个人在背景墙上签到，领取纪念品", icon: "fa-pen-fancy", color: "text-pink-400" },
             { id: 2, keyword: "拍照", title: "定格时光", content: "背景墙前拍照留念（单人或自由组合小合影），有专业摄影师拍摄", icon: "fa-camera-retro", color: "text-blue-400" },
             { id: 3, keyword: "抽签", title: "命运轮盘", content: "抽取桌号决定座位，除班长丁文理和团支部书记张幞陪同老师坐在主桌不需要抽签之外，其他所有人都抽签定座位", icon: "fa-dice", color: "text-purple-400" },
-            { id: 4, keyword: "视频滚动播放", title: "往日重现", content: "大屏幕滚动播放视频", icon: "fa-film", color: "text-yellow-400" },
-            { id: 5, keyword: "开场白", title: "主持人登场", content: "主持人开场白，四名主持人登场", icon: "fa-microphone-alt", color: "text-red-400" },
-            { id: 6, keyword: "点名", title: "久违的答到", content: "李老师按照花名册点名，同学们喊到", icon: "fa-user-check", color: "text-green-400", highlight: true },
+            { id: 4, keyword: "视频", title: "往日重现", content: "大屏幕滚动播放往昔视频，重温那段青葱岁月", icon: "fa-film", color: "text-yellow-400" },
+            { id: 5, keyword: "开场", title: "主持人登场", content: "四名主持人登场，致开场白", icon: "fa-microphone-alt", color: "text-red-400" },
+            { id: 6, keyword: "点名", title: "久违的答到", content: "李老师按照花名册点名，同学们喊“到”", icon: "fa-user-check", color: "text-green-400", highlight: true },
             { id: 7, keyword: "送礼", title: "师恩难忘", content: "丁文理代表全体同学给李老师赠送礼物", icon: "fa-gift", color: "text-pink-500" },
-            { id: 8, keyword: "青春无悔（上）", title: "关键词互动", content: "主持人宣布请每个同学在提前准备好的小程序上选择对116班最认可的三个关键词", icon: "fa-mobile-alt", color: "text-blue-500" },
-            { id: 9, keyword: "有奖趣味抢答1", title: "记忆大考验", content: "设计一些跟116班当年学习生活相关的问题，主持人提问，同学们举手抢答", icon: "fa-brain", color: "text-yellow-500" },
-            { id: 10, keyword: "同学才艺表演1", title: "思念 · 禹咪咪", content: "禹咪咪同学独唱《思念》", icon: "fa-music", color: "text-purple-500" },
-            { id: 11, keyword: "青春无悔（下）", title: "感悟分享", content: "张幞宣布圈点率最高的三个关键词，主持人请同学自由发言对这三个词的理解", icon: "fa-quote-left", color: "text-indigo-400" },
-            { id: 12, keyword: "有奖趣味抢答2", title: "手慢无", content: "设计一些跟116班当年学习生活相关的问题，主持人提问，同学们举手抢答", icon: "fa-hand-paper", color: "text-yellow-500" },
-            { id: 13, keyword: "同学才艺表演2", title: "同桌的你 · 曾阳", content: "曾阳同学独唱《同桌的你》", icon: "fa-guitar", color: "text-purple-500" },
-            { id: 14, keyword: "真心话大冒险", title: "终极互动", content: "请6-8名同学上台，站立在舞台中央，主持人提问，同学们必须真实应答，但不能说话，而是行动应答，即：回答“是”的往左站，回答“否”的往右站（十个问题）。", icon: "fa-heartbeat", color: "text-red-500", highlight: true },
-            // --- 15-24项 (新增) ---
-            { id: 15, keyword: "同学才艺表演3", title: "梁祝 · 申朝晖", content: "申朝晖同学古筝独奏《梁祝》", icon: "fa-music", color: "text-teal-400" },
-            { id: 16, keyword: "有奖趣味抢答3", title: "记忆比拼", content: "设计一些跟116班当年学习生活相关的问题，主持人提问，同学们举手抢答", icon: "fa-brain", color: "text-yellow-500" },
-            { id: 17, keyword: "同学才艺表演4", title: "假如爱有天意 · 刘文军", content: "刘文军同学演唱《假如爱有天意》", icon: "fa-microphone", color: "text-blue-500" },
-            { id: 18, keyword: "有奖趣味抢答4", title: "终极抢答", content: "设计一些跟116班当年学习生活相关的问题，主持人提问，同学们举手抢答", icon: "fa-bolt", color: "text-yellow-500" },
-            { id: 19, keyword: "时光胶囊", title: "寄语未来", content: "每个同学在提前放置在卡片上写下对下次聚会时的期待、祝福、愿景等，当场封存，请同学保存，待下次聚会时打开解密", icon: "fa-hourglass-half", color: "text-purple-400", highlight: true },
-            { id: 20, keyword: "同学才艺表演4", title: "今夜无眠 · 马向红", content: "马向红同学演唱《今夜无眠》", icon: "fa-star", color: "text-pink-500" },
-            { id: 21, keyword: "大合唱", title: "光阴的故事", content: "全体大合唱《光阴的故事》，禹咪咪指挥，其他主持人领唱", icon: "fa-music", color: "text-orange-400", highlight: true },
-            { id: 22, keyword: "大合影", title: "全家福", content: "全体同学和老师合影留念", icon: "fa-camera", color: "text-blue-300" },
+            { id: 8, keyword: "互动", title: "青春无悔（上）", content: "主持人宣布请每个同学在提前准备好的小程序上选择对116班最认可的三个关键词", icon: "fa-mobile-alt", color: "text-blue-500" },
+            { id: 9, keyword: "抢答", title: "记忆大考验", content: "趣味抢答环节，问题与当年学习生活相关", icon: "fa-brain", color: "text-yellow-500" },
+            { id: 10, keyword: "表演", title: "思念 · 禹咪咪", content: "禹咪咪同学独唱《思念》", icon: "fa-music", color: "text-purple-500" },
+            { id: 11, keyword: "感悟", title: "青春无悔（下）", content: "张幞宣布圈点率最高的三个关键词，同学自由发言分享理解", icon: "fa-quote-left", color: "text-indigo-400" },
+            { id: 12, keyword: "抢答", title: "手慢无", content: "第二轮趣味抢答，重温课堂时光", icon: "fa-hand-paper", color: "text-yellow-500" },
+            { id: 13, keyword: "表演", title: "同桌的你 · 曾阳", content: "曾阳同学独唱《同桌的你》", icon: "fa-guitar", color: "text-purple-500" },
+            { id: 14, keyword: "游戏", title: "真心话大冒险", content: "终极互动：6-8名同学上台，针对提问通过站位回答“是”或“否”", icon: "fa-heartbeat", color: "text-red-500", highlight: true },
+            { id: 15, keyword: "表演", title: "梁祝 · 申朝晖", content: "申朝晖同学古筝独奏《梁祝》", icon: "fa-music", color: "text-teal-400" },
+            { id: 16, keyword: "抢答", title: "记忆比拼", content: "第三轮趣味抢答", icon: "fa-brain", color: "text-yellow-500" },
+            { id: 17, keyword: "表演", title: "假如爱有天意 · 刘文军", content: "刘文军同学演唱《假如爱有天意》", icon: "fa-microphone", color: "text-blue-500" },
+            { id: 18, keyword: "抢答", title: "终极抢答", content: "最后一轮趣味抢答", icon: "fa-bolt", color: "text-yellow-500" },
+            { id: 19, keyword: "封存", title: "时光胶囊", content: "写下对下次聚会的期待与祝福，当场封存", icon: "fa-hourglass-half", color: "text-purple-400", highlight: true },
+            { id: 20, keyword: "表演", title: "今夜无眠 · 马向红", content: "马向红同学演唱《今夜无眠》", icon: "fa-star", color: "text-pink-500" },
+            { id: 21, keyword: "合唱", title: "光阴的故事", content: "全体大合唱，禹咪咪指挥，主持人领唱", icon: "fa-music", color: "text-orange-400", highlight: true },
+            { id: 22, keyword: "合影", title: "全家福", content: "全体同学和老师合影留念", icon: "fa-camera", color: "text-blue-300" },
             { id: 23, keyword: "晚餐", title: "举杯同庆", content: "共进晚餐，畅叙同窗情谊", icon: "fa-utensils", color: "text-red-400" },
-            { id: 24, keyword: "纪念册", title: "永恒回忆", content: "活动结束后制作完成本次聚会的电子纪念相册", icon: "fa-book-open", color: "text-indigo-400" }
+            { id: 24, keyword: "纪念", title: "永恒回忆", content: "活动结束后制作电子纪念相册", icon: "fa-book-open", color: "text-indigo-400" }
         ];
 
         // --- 2. 动态渲染时间轴 ---
@@ -312,7 +331,7 @@
                     <div class="card-marker absolute top-6 w-5 h-5 rounded-full bg-gray-900 border-2 border-yellow-400 shadow-[0_0_10px_#ffd700] z-10 ${markerPos}"></div>
                     
                     <!-- 卡片 -->
-                    <div class="memory-card p-6 w-full md:max-w-md relative overflow-hidden group hover:border-opacity-50 ${item.highlight ? 'border-yellow-500/50 bg-yellow-500/5' : ''}">
+                    <div class="memory-card timeline-card p-6 w-full md:max-w-md relative overflow-hidden group hover:border-opacity-50 ${item.highlight ? 'border-yellow-500/50 bg-yellow-500/5' : ''}">
                         <!-- 装饰背景数字 -->
                         <span class="absolute -right-4 -bottom-8 text-8xl font-bold opacity-10 font-tech pointer-events-none text-white">${item.id.toString().padStart(2, '0')}</span>
                         
@@ -333,7 +352,7 @@
             timelineContainer.innerHTML += html;
         });
 
-        // --- 3. Scroll Reveal 动画 (Intersection Observer) ---
+        // --- 3. Scroll Reveal 动画 ---
         const observerOptions = {
             threshold: 0.15,
             rootMargin: "0px 0px -50px 0px"
@@ -342,9 +361,9 @@
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    entry.target.querySelector('.memory-card').classList.add('visible');
-                    // 只有当完全进入视野且是新元素时，才不再观察(可选)
-                    // observer.unobserve(entry.target); 
+                    const card = entry.target.querySelector('.memory-card');
+                    if(card) card.classList.add('visible');
+                    // observer.unobserve(entry.target); // 取消注释则只触发一次
                 }
             });
         }, observerOptions);
@@ -353,7 +372,7 @@
             observer.observe(item);
         });
 
-        // --- 4. 粒子背景特效 (Canvas) ---
+        // --- 4. 粒子背景特效 ---
         const canvas = document.getElementById('memory-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
@@ -410,45 +429,24 @@
         initParticles();
         animateParticles();
 
-        // --- 5. 音乐播放器逻辑 (Mock) ---
-        let isPlaying = true;
-        function toggleMusic() {
-            const icon = document.getElementById('music-icon');
-            const btn = document.getElementById('play-btn');
-            
-            isPlaying = !isPlaying;
-            if(isPlaying) {
-                icon.classList.remove('vinyl-paused');
-                btn.classList.remove('fa-play');
-                btn.classList.add('fa-pause');
-            } else {
-                icon.classList.add('vinyl-paused');
-                btn.classList.remove('fa-pause');
-                btn.classList.add('fa-play');
-            }
-        }
-
-        // --- 6. 3D Tilt Effect for Cards (鼠标移动时的视差) ---
+        // --- 5. 3D Tilt Effect ---
         document.querySelectorAll('.memory-card').forEach(card => {
             card.addEventListener('mousemove', (e) => {
                 const rect = card.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
-                
                 const midX = rect.width / 2;
                 const midY = rect.height / 2;
-                
-                const rotateX = ((y - midY) / midY) * -5; // Max 5deg rotation
-                const rotateY = ((x - midX) / midX) * 5;
-
-                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+                // 减小旋转幅度以防止文字模糊
+                const rotateX = ((y - midY) / midY) * -3; 
+                const rotateY = ((x - midX) / midX) * 3;
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.01)`;
             });
 
             card.addEventListener('mouseleave', () => {
                 card.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale(1)`;
             });
         });
-
     </script>
 </body>
 </html>
