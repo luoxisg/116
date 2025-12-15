@@ -259,7 +259,7 @@
              <i class="fas fa-compact-disc text-gray-400 text-lg vinyl-spin" id="music-icon"></i>
         </div>
         <div class="flex flex-col mr-4">
-            <span class="text-xs text-yellow-500 font-bold">同桌的你</span>
+            <span class="text-xs text-yellow-500 font-bold">光阴的故事</span>
             <span class="text-[10px] text-gray-400">正在播放...</span>
         </div>
         <button onclick="toggleMusic()" class="text-white hover:text-yellow-400 transition">
@@ -268,22 +268,33 @@
     </div>
 
     <script>
-        // --- 1. 数据配置 (基于 CSV) ---
+        // --- 1. 数据配置 (严格基于 CSV 全部24项内容) ---
         const scheduleData = [
             { id: 1, keyword: "签到", title: "记忆重启", content: "每个人在背景墙上签到，领取纪念品", icon: "fa-pen-fancy", color: "text-pink-400" },
             { id: 2, keyword: "拍照", title: "定格时光", content: "背景墙前拍照留念（单人或自由组合小合影），有专业摄影师拍摄", icon: "fa-camera-retro", color: "text-blue-400" },
             { id: 3, keyword: "抽签", title: "命运轮盘", content: "抽取桌号决定座位，除班长丁文理和团支部书记张幞陪同老师坐在主桌不需要抽签之外，其他所有人都抽签定座位", icon: "fa-dice", color: "text-purple-400" },
-            { id: 4, keyword: "视频", title: "往日重现", content: "大屏幕滚动播放视频", icon: "fa-film", color: "text-yellow-400" },
-            { id: 5, keyword: "开场", title: "班会开启", content: "主持人开场白，四名主持人登场", icon: "fa-microphone-alt", color: "text-red-400" },
+            { id: 4, keyword: "视频滚动播放", title: "往日重现", content: "大屏幕滚动播放视频", icon: "fa-film", color: "text-yellow-400" },
+            { id: 5, keyword: "开场白", title: "主持人登场", content: "主持人开场白，四名主持人登场", icon: "fa-microphone-alt", color: "text-red-400" },
             { id: 6, keyword: "点名", title: "久违的答到", content: "李老师按照花名册点名，同学们喊到", icon: "fa-user-check", color: "text-green-400", highlight: true },
             { id: 7, keyword: "送礼", title: "师恩难忘", content: "丁文理代表全体同学给李老师赠送礼物", icon: "fa-gift", color: "text-pink-500" },
-            { id: 8, keyword: "关键词", title: "青春无悔(上)", content: "主持人宣布请每个同学在提前准备好的小程序上选择对116班最认可的三个关键词", icon: "fa-mobile-alt", color: "text-blue-500" },
-            { id: 9, keyword: "抢答", title: "记忆大考验", content: "设计一些跟116班当年学习生活相关的问题，主持人提问，同学们举手抢答", icon: "fa-brain", color: "text-yellow-500" },
-            { id: 10, keyword: "表演", title: "才艺Show 1", content: "禹咪咪同学独唱《思念》", icon: "fa-music", color: "text-purple-500" },
-            { id: 11, keyword: "分享", title: "青春无悔(下)", content: "张幞宣布圈点率最高的三个关键词，主持人请同学自由发言对这三个词的理解", icon: "fa-quote-left", color: "text-indigo-400" },
-            { id: 12, keyword: "抢答", title: "趣味抢答 2", content: "同上（有奖趣味抢答1）：设计一些跟116班当年学习生活相关的问题，主持人提问，同学们举手抢答", icon: "fa-hand-paper", color: "text-yellow-500" },
-            { id: 13, keyword: "表演", title: "才艺Show 2", content: "曾阳同学独唱《同桌的你》", icon: "fa-guitar", color: "text-purple-500" },
-            { id: 14, keyword: "互动", title: "真心话大冒险", content: "请6-8名同学上台，站立在舞台中央，主持人提问，同学们必须真实应答，但不能说话，而是行动应答，即：回答“是”的往左站，回答“否”的往右站。", icon: "fa-heartbeat", color: "text-red-500", highlight: true }
+            { id: 8, keyword: "青春无悔（上）", title: "关键词互动", content: "主持人宣布请每个同学在提前准备好的小程序上选择对116班最认可的三个关键词", icon: "fa-mobile-alt", color: "text-blue-500" },
+            { id: 9, keyword: "有奖趣味抢答1", title: "记忆大考验", content: "设计一些跟116班当年学习生活相关的问题，主持人提问，同学们举手抢答", icon: "fa-brain", color: "text-yellow-500" },
+            { id: 10, keyword: "同学才艺表演1", title: "思念 · 禹咪咪", content: "禹咪咪同学独唱《思念》", icon: "fa-music", color: "text-purple-500" },
+            { id: 11, keyword: "青春无悔（下）", title: "感悟分享", content: "张幞宣布圈点率最高的三个关键词，主持人请同学自由发言对这三个词的理解", icon: "fa-quote-left", color: "text-indigo-400" },
+            { id: 12, keyword: "有奖趣味抢答2", title: "手慢无", content: "设计一些跟116班当年学习生活相关的问题，主持人提问，同学们举手抢答", icon: "fa-hand-paper", color: "text-yellow-500" },
+            { id: 13, keyword: "同学才艺表演2", title: "同桌的你 · 曾阳", content: "曾阳同学独唱《同桌的你》", icon: "fa-guitar", color: "text-purple-500" },
+            { id: 14, keyword: "真心话大冒险", title: "终极互动", content: "请6-8名同学上台，站立在舞台中央，主持人提问，同学们必须真实应答，但不能说话，而是行动应答，即：回答“是”的往左站，回答“否”的往右站（十个问题）。", icon: "fa-heartbeat", color: "text-red-500", highlight: true },
+            // --- 15-24项 (新增) ---
+            { id: 15, keyword: "同学才艺表演3", title: "梁祝 · 申朝晖", content: "申朝晖同学古筝独奏《梁祝》", icon: "fa-music", color: "text-teal-400" },
+            { id: 16, keyword: "有奖趣味抢答3", title: "记忆比拼", content: "设计一些跟116班当年学习生活相关的问题，主持人提问，同学们举手抢答", icon: "fa-brain", color: "text-yellow-500" },
+            { id: 17, keyword: "同学才艺表演4", title: "假如爱有天意 · 刘文军", content: "刘文军同学演唱《假如爱有天意》", icon: "fa-microphone", color: "text-blue-500" },
+            { id: 18, keyword: "有奖趣味抢答4", title: "终极抢答", content: "设计一些跟116班当年学习生活相关的问题，主持人提问，同学们举手抢答", icon: "fa-bolt", color: "text-yellow-500" },
+            { id: 19, keyword: "时光胶囊", title: "寄语未来", content: "每个同学在提前放置在卡片上写下对下次聚会时的期待、祝福、愿景等，当场封存，请同学保存，待下次聚会时打开解密", icon: "fa-hourglass-half", color: "text-purple-400", highlight: true },
+            { id: 20, keyword: "同学才艺表演4", title: "今夜无眠 · 马向红", content: "马向红同学演唱《今夜无眠》", icon: "fa-star", color: "text-pink-500" },
+            { id: 21, keyword: "大合唱", title: "光阴的故事", content: "全体大合唱《光阴的故事》，禹咪咪指挥，其他主持人领唱", icon: "fa-music", color: "text-orange-400", highlight: true },
+            { id: 22, keyword: "大合影", title: "全家福", content: "全体同学和老师合影留念", icon: "fa-camera", color: "text-blue-300" },
+            { id: 23, keyword: "晚餐", title: "举杯同庆", content: "共进晚餐，畅叙同窗情谊", icon: "fa-utensils", color: "text-red-400" },
+            { id: 24, keyword: "纪念册", title: "永恒回忆", content: "活动结束后制作完成本次聚会的电子纪念相册", icon: "fa-book-open", color: "text-indigo-400" }
         ];
 
         // --- 2. 动态渲染时间轴 ---
