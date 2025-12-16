@@ -466,11 +466,12 @@
 都算我们又在同一个教室里坐了一会儿。
 
 ---
-署名可选：
 路过的同桌`,
                 dark: true, 
-                // 使用 Unicode Emoji 解决图片加载失败问题
-                reaction: ['❤️', '👍', '😎', '😂'], 
+                // 添加微信登录支持提示（需要在后端配置好后才会真正生效）
+                // 目前前端通过配置允许显示登录按钮
+                login: 'enable', 
+                // 移除了 reaction 配置项，以去掉评分功能
                 // 使用 jsDelivr 替换 unpkg 提高稳定性
                 emoji: [
                     'https://cdn.jsdelivr.net/npm/@waline/emojis@1.2.0/weibo',
