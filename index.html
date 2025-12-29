@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>湘新智韵 (Xiang-Sing AI Tunes) - 跨境AI音乐平台商业计划书</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            height: 350px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        @media (max-width: 640px) {
+            .chart-container { height: 280px; }
+        }
+
+        .interactive-card {
+            transition: all 0.3s ease;
+        }
+        .interactive-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-link.active {
+            color: #0f172a;
+            border-bottom: 2px solid #0f172a;
+        }
+
+        /* Toggle Switch Styling */
+        .mode-btn { transition: all 0.2s; }
+        .mode-btn.active { background-color: #0f172a; color: white; border-color: #0f172a; }
+        .mode-btn:not(.active):hover { background-color: #e2e8f0; }
+
+        /* Architecture Diagram Lines */
+        .arch-line { border-left: 2px dashed #cbd5e1; height: 100%; position: absolute; left: 50%; top: 0; z-index: 0; }
+    </style>
+    <!-- Application Structure Plan:
+         1. Vision: Intro Xiang-Sing AI Tunes (Project Xiang-Yun). Cultural Arbitrage.
+         2. Phase 1 (MVP): Keep the Manual Service (Validation).
+         3. Phase 2 (Platform): The new AI Platform architecture + Sales Agent Model.
+         4. Financials: 3-Mode Calculator (Manual / Pro / AI Platform).
+         5. Roadmap: Cold Start -> Douyin -> B2B.
+    -->
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">🎵</span>
+                    <span class="font-bold text-xl tracking-tight text-slate-900">湘新智韵 | Xiang-Sing AI</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <button onclick="scrollToSection('vision')" class="nav-link active text-slate-600 hover:text-slate-900 px-3 py-2 text-sm font-medium transition-colors">战略总览</button>
+                    <button onclick="scrollToSection('platform')" class="nav-link text-slate-600 hover:text-slate-900 px-3 py-2 text-sm font-medium transition-colors">平台架构</button>
+                    <button onclick="scrollToSection('sales')" class="nav-link text-slate-600 hover:text-slate-900 px-3 py-2 text-sm font-medium transition-colors">众包销售</button>
+                    <button onclick="scrollToSection('financials')" class="nav-link text-slate-600 hover:text-slate-900 px-3 py-2 text-sm font-medium transition-colors">全景财务</button>
+                </div>
+                <button class="md:hidden text-slate-600" onclick="alert('请使用桌面端以获得最佳体验。')">☰</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-20">
+
+        <!-- 1. Executive Summary & Vision -->
+        <section id="vision" class="scroll-mt-24">
+            <div class="bg-white rounded-2xl p-8 shadow-sm border border-slate-200">
+                <div class="text-center mb-10">
+                    <span class="bg-indigo-100 text-indigo-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">Project Xiang-Yun</span>
+                    <h1 class="text-3xl md:text-4xl font-bold text-slate-900 mt-4 mb-4">湘新智韵：基于 Suno AI 的跨境音乐文创引擎</h1>
+                    <p class="text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed">
+                        这是一次精准的<strong>“文化套利”与“技术桥接”</strong>。我们利用新加坡的金融技术架构解决 Suno 访问与支付难题，通过中国音乐家的“提示词工程”解决文化隔阂，打造懂中文、懂湘韵的 AI 音乐平台。
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 interactive-card">
+                        <div class="text-2xl mb-2">🇸🇬</div>
+                        <h3 class="font-bold text-base mb-1">新加坡中枢</h3>
+                        <p class="text-xs text-slate-500">技术/金融/合规主体。Stripe聚合支付，CN2 GIA 低延迟节点。</p>
+                    </div>
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 interactive-card">
+                        <div class="text-2xl mb-2">🇨🇳</div>
+                        <h3 class="font-bold text-base mb-1">中国运营端</h3>
+                        <p class="text-xs text-slate-500">文化/ICP/销售主体。音乐家提供 Prompt 调优，处理合规内容过滤。</p>
+                    </div>
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 interactive-card">
+                        <div class="text-2xl mb-2">🤖</div>
+                        <h3 class="font-bold text-base mb-1">Suno 内核</h3>
+                        <p class="text-xs text-slate-500">基于 V5 模型。通过反向代理与账号池技术，实现低成本高并发生成。</p>
+                    </div>
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 interactive-card">
+                        <div class="text-2xl mb-2">🎭</div>
+                        <h3 class="font-bold text-base mb-1">湘韵引擎</h3>
+                        <p class="text-xs text-slate-500">核心壁垒。将“花鼓戏/长沙策”转译为 AI 声学参数的中间件。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Platform Architecture (Compliance & Tech) -->
+        <section id="platform" class="scroll-mt-24">
+            <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                <span class="text-blue-600">🏗️</span> 平台技术架构：跨境合规双重奏
+            </h2>
+            <div class="bg-white rounded-2xl p-0 overflow-hidden shadow-sm border border-slate-200 flex flex-col md:flex-row">
+                
+                <!-- Left: China Side -->
+                <div class="w-full md:w-1/2 p-8 bg-red-50/30 border-r border-slate-100 relative">
+                    <div class="absolute top-4 left-4 text-xs font-bold text-red-800 bg-red-100 px-2 py-1 rounded">🇨🇳 中国境内 (用户/运营)</div>
+                    <div class="mt-8 space-y-6">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-white border border-slate-200 rounded-full flex items-center justify-center text-xl shadow-sm z-10">👤</div>
+                            <div class="flex-1 bg-white p-3 rounded-lg border border-slate-200 text-sm">
+                                <span class="font-bold">终端用户/代理</span>
+                                <div class="text-xs text-slate-500">微信/支付宝支付 (RMB)</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-white border border-slate-200 rounded-full flex items-center justify-center text-xl shadow-sm z-10">🛡️</div>
+                            <div class="flex-1 bg-white p-3 rounded-lg border border-red-200 text-sm">
+                                <span class="font-bold text-red-700">合规防火墙 (ICP)</span>
+                                <div class="text-xs text-slate-500">敏感词过滤 (政治/暴力)<br>数据本地化存储 (手机号)</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Connection Line -->
+                    <div class="hidden md:block absolute top-1/2 right-0 w-8 h-[2px] bg-slate-300"></div>
+                </div>
+
+                <!-- Right: Singapore Side -->
+                <div class="w-full md:w-1/2 p-8 bg-indigo-50/30 relative">
+                    <div class="absolute top-4 right-4 text-xs font-bold text-indigo-800 bg-indigo-100 px-2 py-1 rounded">🇸🇬 新加坡 (技术/金融)</div>
+                    <div class="mt-8 space-y-6">
+                        <div class="flex items-center gap-4 flex-row-reverse text-right">
+                            <div class="w-12 h-12 bg-white border border-slate-200 rounded-full flex items-center justify-center text-xl shadow-sm z-10">☁️</div>
+                            <div class="flex-1 bg-white p-3 rounded-lg border border-indigo-200 text-sm">
+                                <span class="font-bold text-indigo-700">CN2 GIA 中转节点</span>
+                                <div class="text-xs text-slate-500">低延迟反向代理<br>Residential Proxy 池</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4 flex-row-reverse text-right">
+                            <div class="w-12 h-12 bg-white border border-slate-200 rounded-full flex items-center justify-center text-xl shadow-sm z-10">🧠</div>
+                            <div class="flex-1 bg-white p-3 rounded-lg border border-slate-200 text-sm">
+                                <span class="font-bold">Suno AI API (Wrapper)</span>
+                                <div class="text-xs text-slate-500">Prompt 注入与生成<br>Stripe 结算 (USD/SGD)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. New Sales Model: Part-time Agents -->
+        <section id="sales" class="scroll-mt-24">
+            <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                <span class="text-green-600">🤝</span> 增长引擎：网络兼职销售体系
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Concept -->
+                <div class="col-span-1 md:col-span-3 bg-green-50 p-6 rounded-2xl border border-green-100">
+                    <p class="text-green-900 text-sm md:text-base">
+                        <strong>策略核心：</strong> 在 MVP 验证成功后，我们不再仅依赖直销，而是将利润释放给数千名“网络兼职业务员”（大学生/宝妈/KOC）。
+                        利用其私域流量（微信群/闲鱼/小红书）进行低成本、爆发式获客。
+                    </p>
+                </div>
+
+                <!-- Step 1: Recruitment -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 w-20 h-20 bg-slate-100 rounded-full"></div>
+                    <h3 class="font-bold text-lg mb-2 relative z-10">1. 招募与发码</h3>
+                    <p class="text-sm text-slate-600 relative z-10">
+                        <strong>渠道：</strong> 校园代理、闲鱼兼职群。<br>
+                        <strong>工具：</strong> 为每位业务员生成专属推广码或分销链接（Tracking Link）。
+                    </p>
+                </div>
+
+                <!-- Step 2: Distribution -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 w-20 h-20 bg-slate-100 rounded-full"></div>
+                    <h3 class="font-bold text-lg mb-2 relative z-10">2. 全网分发</h3>
+                    <p class="text-sm text-slate-600 relative z-10">
+                        <strong>场景：</strong> 
+                        <span class="bg-slate-100 px-1 rounded">闲鱼</span> 挂“AI写歌服务”；
+                        <span class="bg-slate-100 px-1 rounded">抖音</span> 发“赛博花鼓戏”视频挂链接；
+                        <span class="bg-slate-100 px-1 rounded">微信群</span> 发体验券。
+                    </p>
+                </div>
+
+                <!-- Step 3: Commission -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 w-20 h-20 bg-slate-100 rounded-full"></div>
+                    <h3 class="font-bold text-lg mb-2 relative z-10">3. 佣金结算</h3>
+                    <p class="text-sm text-slate-600 relative z-10">
+                        <strong>模式：</strong> CPS (Cost Per Sale)。<br>
+                        <strong>比例：</strong> 首单高佣（30%-50%），续费长尾（10%）。
+                        <br><span class="text-green-600 font-bold text-xs">日结/周结，激励性强。</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Financials (3 Modes) -->
+        <section id="financials" class="scroll-mt-24">
+            <h2 class="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <span class="text-amber-600">📊</span> 全景财务模型
+            </h2>
+            
+            <!-- Controls -->
+            <div class="bg-white rounded-t-2xl p-4 border-b border-slate-100 flex flex-wrap gap-2 justify-center bg-slate-50">
+                <button onclick="setMode('mvp')" id="btn-mvp" class="mode-btn px-4 py-2 rounded-lg text-sm font-bold border border-slate-200 shadow-sm">
+                    Phase 1: 人工 MVP
+                </button>
+                <button onclick="setMode('pro')" id="btn-pro" class="mode-btn px-4 py-2 rounded-lg text-sm font-bold border border-slate-200 shadow-sm">
+                    Phase 1: 高端定制 (艺考)
+                </button>
+                <button onclick="setMode('platform')" id="btn-platform" class="mode-btn active px-4 py-2 rounded-lg text-sm font-bold border border-indigo-600 bg-indigo-600 text-white shadow-md">
+                    Phase 2: AI 平台 (湘新智韵)
+                </button>
+            </div>
+
+            <div class="bg-white rounded-b-2xl p-6 shadow-sm border border-slate-200 grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Info Panel -->
+                <div class="col-span-1 space-y-4">
+                    <h3 id="mode-title" class="font-bold text-xl text-indigo-700">AI 平台订阅模式</h3>
+                    <p id="mode-desc" class="text-sm text-slate-600">
+                        基于 Suno API 的自助服务。通过“免费体验+会员订阅+加油包”变现。成本极低（$0.05/首），适合海量并发。
+                    </p>
+                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                        <div class="flex justify-between text-sm mb-2">
+                            <span class="text-slate-500">单体成本 (COGS)</span>
+                            <span id="unit-cost" class="font-bold">¥0.20</span>
+                        </div>
+                        <div class="flex justify-between text-sm mb-2">
+                            <span class="text-slate-500">毛利率 (Gross Margin)</span>
+                            <span id="gross-margin" class="font-bold text-green-600">85%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calculator -->
+                <div class="col-span-1 lg:col-span-2 space-y-6">
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-sm font-bold text-slate-700">平均客单价 (ARPU)</label>
+                            <span id="price-display" class="font-bold text-indigo-600">¥39</span>
+                        </div>
+                        <input type="range" id="price-slider" class="w-full accent-indigo-600 h-2 bg-slate-200 rounded-lg cursor-pointer">
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-sm font-bold text-slate-700">月付费用户数 (MAU)</label>
+                            <span id="volume-display" class="font-bold text-green-600">1,000人</span>
+                        </div>
+                        <input type="range" id="volume-slider" class="w-full accent-green-600 h-2 bg-slate-200 rounded-lg cursor-pointer">
+                    </div>
+
+                    <!-- Chart -->
+                    <div class="chart-container h-48">
+                        <canvas id="financialChart"></canvas>
+                    </div>
+
+                    <div class="flex justify-between items-center pt-4 border-t border-slate-100">
+                        <span class="text-sm text-slate-500">预估月净利</span>
+                        <span id="profit-display" class="text-2xl font-bold text-indigo-700">¥38,800</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. Roadmap -->
+        <section class="bg-slate-900 text-white rounded-2xl p-8 shadow-xl">
+            <h2 class="text-2xl font-bold mb-8">🚀 落地执行路线图</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="border-l-4 border-indigo-500 pl-4">
+                    <h3 class="font-bold text-lg mb-2 text-indigo-300">Phase 1: 冷启动 (1-3月)</h3>
+                    <ul class="text-sm space-y-2 text-slate-300">
+                        <li>• 搭建 Suno API Wrapper 与 住宅IP池。</li>
+                        <li>• 音乐家调试 20 个核心“湘韵” Prompt。</li>
+                        <li>• 招募 100 位种子用户（大学生社团）。</li>
+                    </ul>
+                </div>
+                <div class="border-l-4 border-pink-500 pl-4">
+                    <h3 class="font-bold text-lg mb-2 text-pink-300">Phase 2: 爆发 (4-6月)</h3>
+                    <ul class="text-sm space-y-2 text-slate-300">
+                        <li>• <strong>事件营销：</strong> #AI花鼓戏挑战# 抖音话题。</li>
+                        <li>• <strong>分销启动：</strong> 招募 500 名兼职销售，铺设闲鱼/私域。</li>
+                        <li>• 上线月卡会员体系 (¥39/月)。</li>
+                    </ul>
+                </div>
+                <div class="border-l-4 border-green-500 pl-4">
+                    <h3 class="font-bold text-lg mb-2 text-green-300">Phase 3: 生态 (7月+)</h3>
+                    <ul class="text-sm space-y-2 text-slate-300">
+                        <li>• B2B API 开放（文旅/餐饮）。</li>
+                        <li>• 线下体验店（长沙文和友）。</li>
+                        <li>• 社区“Remix接力”功能上线。</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <footer class="border-t border-slate-200 py-8 text-center text-slate-500 text-sm">
+            <p>© 2025 湘新智韵 | Xiang-Sing AI Tunes. 新加坡-中国跨界联合出品。</p>
+        </footer>
+
+    </main>
+
+    <script>
+        // Data Models
+        const modes = {
+            mvp: {
+                title: "Phase 1: 人工 MVP (生日歌)",
+                desc: "人工客服接单 + 简单AI辅助 + 闲鱼代工。高人工介入，低并发。",
+                cost: 40,
+                priceDefault: 168,
+                volDefault: 50,
+                priceRange: { min: 50, max: 300, step: 10 },
+                volRange: { min: 10, max: 200, step: 10 },
+                theme: "blue"
+            },
+            pro: {
+                title: "Phase 1: 高端定制 (艺考)",
+                desc: "资深音乐家介入 + 专业录音棚。极高客单价，服务高净值人群。",
+                cost: 800,
+                priceDefault: 2800,
+                volDefault: 10,
+                priceRange: { min: 1000, max: 8000, step: 100 },
+                volRange: { min: 1, max: 50, step: 1 },
+                theme: "amber"
+            },
+            platform: {
+                title: "Phase 2: AI 平台订阅 (湘新智韵)",
+                desc: "全自动 Suno API 平台。成本主要为算力与代理(COGS)。海量并发，分销裂变。",
+                cost: 0.2, // 0.2 RMB per song
+                priceDefault: 39, // Average subscription revenue per user
+                volDefault: 1000,
+                priceRange: { min: 9.9, max: 199, step: 1 }, // Subscription prices
+                volRange: { min: 100, max: 10000, step: 100 },
+                theme: "indigo"
+            }
+        };
+
+        let currentMode = 'platform'; // Default to the new platform mode
+        let chartInstance = null;
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            initChart();
+            setMode('platform');
+            
+            // Listeners
+            document.getElementById('price-slider').addEventListener('input', updateCalc);
+            document.getElementById('volume-slider').addEventListener('input', updateCalc);
+        });
+
+        function setMode(modeKey) {
+            currentMode = modeKey;
+            const data = modes[modeKey];
+            
+            // Update UI Text
+            document.getElementById('mode-title').innerText = data.title;
+            document.getElementById('mode-title').className = `font-bold text-xl text-${data.theme}-700`;
+            document.getElementById('mode-desc').innerText = data.desc;
+            document.getElementById('unit-cost').innerText = `¥${data.cost}`;
+            
+            // Update Buttons
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.className = 'mode-btn px-4 py-2 rounded-lg text-sm font-bold border border-slate-200 shadow-sm bg-white text-slate-600';
+            });
+            const activeBtn = document.getElementById(`btn-${modeKey}`);
+            activeBtn.className = `mode-btn active px-4 py-2 rounded-lg text-sm font-bold border border-${data.theme}-600 bg-${data.theme}-600 text-white shadow-md`;
+
+            // Update Sliders
+            const pSlider = document.getElementById('price-slider');
+            pSlider.min = data.priceRange.min;
+            pSlider.max = data.priceRange.max;
+            pSlider.step = data.priceRange.step;
+            pSlider.value = data.priceDefault;
+            pSlider.className = `w-full h-2 bg-slate-200 rounded-lg cursor-pointer accent-${data.theme}-600`;
+
+            const vSlider = document.getElementById('volume-slider');
+            vSlider.min = data.volRange.min;
+            vSlider.max = data.volRange.max;
+            vSlider.step = data.volRange.step;
+            vSlider.value = data.volDefault;
+            vSlider.className = `w-full h-2 bg-slate-200 rounded-lg cursor-pointer accent-green-600`;
+
+            updateCalc();
+        }
+
+        function updateCalc() {
+            const data = modes[currentMode];
+            const price = parseFloat(document.getElementById('price-slider').value);
+            const volume = parseInt(document.getElementById('volume-slider').value);
+            const cost = data.cost;
+
+            // Platform mode calculation logic (Volume = Users, not just songs)
+            // For platform, cost is per song, but price is per user. 
+            // Assumption: 1 User generates ~30 songs/month
+            let totalCost = 0;
+            if (currentMode === 'platform') {
+                const songsPerUser = 30; 
+                totalCost = volume * songsPerUser * cost; // Total server cost
+            } else {
+                totalCost = volume * cost; // Manual/Pro is per unit cost
+            }
+
+            const revenue = price * volume;
+            const profit = revenue - totalCost;
+            const margin = ((revenue - totalCost) / revenue * 100).toFixed(0);
+
+            // Display Updates
+            document.getElementById('price-display').innerText = `¥${price}`;
+            document.getElementById('volume-display').innerText = `${volume.toLocaleString()} ${currentMode === 'platform' ? '用户' : '单'}`;
+            document.getElementById('profit-display').innerText = `¥${profit.toLocaleString()}`;
+            document.getElementById('gross-margin').innerText = isNaN(margin) ? '0%' : `${margin}%`;
+
+            // Chart Update
+            if (chartInstance) {
+                chartInstance.data.datasets[0].data = [revenue, totalCost, profit];
+                chartInstance.update();
+            }
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('financialChart').getContext('2d');
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['总营收', '总成本', '净利润'],
+                    datasets: [{
+                        label: '金额 (RMB)',
+                        data: [0, 0, 0],
+                        backgroundColor: [
+                            'rgba(99, 102, 241, 0.6)', // Indigo
+                            'rgba(239, 68, 68, 0.6)',  // Red
+                            'rgba(34, 197, 94, 0.6)'   // Green
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        }
+
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
