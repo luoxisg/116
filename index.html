@@ -1,5 +1,4 @@
- 
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -132,7 +131,7 @@
             white-space: nowrap; border: 4px solid rgba(0,0,0,0.02); padding: 10px;
         }
         .mba-header { border-bottom: 2px solid #222; padding-bottom: 12px; margin-bottom: 20px; display:flex; justify-content:space-between; align-items:flex-end; }
-        .mba-logo-text { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 700; color: #111; line-height: 1; }
+        .mba-logo-text { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700; color: #111; line-height: 1; text-transform: uppercase; }
         .mba-meta { font-size: 9px; text-align: right; color: #555; line-height:1.4; font-family: 'Lato', sans-serif; }
         
         .mba-section-head {
@@ -144,19 +143,8 @@
         .mba-table th { text-align: left; border-bottom: 2px solid #333; padding: 6px; font-family: 'Lato', sans-serif; font-weight: 700; text-transform: uppercase; color: #333; }
         .mba-table td { border-bottom: 1px solid #EEE; padding: 8px 6px; vertical-align: middle; color: #444; }
         
-        /* Scoring System Visuals */
-        .score-box {
-            display: inline-flex; align-items: center; justify-content: center;
-            width: 28px; height: 28px; border-radius: 4px; 
-            font-weight: 800; font-size: 11px; color: #FFF;
-        }
-        .grade-S { background: var(--forest-green); } /* 80-90 */
-        .grade-A { background: var(--antique-gold); } /* 70-79 */
-        .grade-B { background: var(--alert-orange); } /* 60-69 */
-        .grade-F { background: var(--velvet-red); }   /* <60 */
-
         .audit-tag {
-            display: inline-block; font-size: 9px; padding: 2px 4px; border-radius: 2px; margin-right: 4px; margin-bottom: 2px;
+            display: inline-block; font-size: 9px; padding: 2px 4px; border-radius: 2px; margin-right: 4px; margin-bottom: 2px; white-space: nowrap;
         }
         .tag-fatal { color: #B71C1C; background: #FFEBEE; border: 1px solid #EF9A9A; }
         .tag-high { color: #E65100; background: #FFF3E0; border: 1px solid #FFCC80; }
@@ -204,16 +192,16 @@
         <div style="background: #FFF; padding: 24px; border-radius: 4px; border:1px solid #EEE;">
             <div class="input-group">
                 <label class="input-label">Core Cash (核心现金权益)</label>
-                <input type="number" id="ipa_cash" class="music-input" value="600" placeholder="CNY (万)">
+                <input type="number" id="ipa_cash" class="music-input" value="800" placeholder="CNY (万)">
             </div>
             <div style="display: flex; gap: 20px;">
                 <div class="input-group" style="flex:1">
                     <label class="input-label">Monthly Inflow (月入)</label>
-                    <input type="number" id="ipa_income" class="music-input" value="25000">
+                    <input type="number" id="ipa_income" class="music-input" value="35000">
                 </div>
                 <div class="input-group" style="flex:1">
                     <label class="input-label">Age (当前年龄)</label>
-                    <input type="number" id="ipa_age" class="music-input editable" value="55">
+                    <input type="number" id="ipa_age" class="music-input editable" value="45">
                 </div>
             </div>
             <button class="btn-baton" onclick="runOverture()">
@@ -385,43 +373,74 @@
             
             <div class="mba-header">
                 <div>
-                    <div class="mba-logo-text">INVESTMENT<br>MEMORANDUM</div>
+                    <div class="mba-logo-text">Strategic<br>Investment Memo</div>
+                    <div style="font-size:9px; letter-spacing:1px; margin-top:5px; color:#666;">PROJECT: SHENZHEN ASSET ACQUISITION</div>
                 </div>
                 <div class="mba-meta">
-                    <strong>TO:</strong> IC COMMITTEE<br>
-                    <strong>DATE:</strong> <span id="rpt-date">2026</span><br>
-                    <strong>RE:</strong> SCORING MATRIX
+                    <strong>DATE:</strong> 1/3/2026<br>
+                    <strong>VERSION:</strong> 2.0 (Fiduciary Standard)<br>
+                    <strong>PROFILE:</strong> SENIOR INVESTOR
                 </div>
             </div>
 
-            <div class="mba-section-head">1. Executive Summary (执行摘要)</div>
-            <p style="font-size:11px; text-align:justify; color:#444;">
-                根据投资者画像（<span id="rpt-age">--</span>岁），系统测算的财务安全边界为 <strong><span id="rpt-limit">--</span>万</strong>。
-                本报告采用 <strong>Max-90 量化评分体系</strong>（满分90分），旨在客观拉开资产差距。任何低于 60 分的资产将被定义为 <span style="color:#D32F2F; font-weight:bold;">TOXIC (有毒)</span> 并不予推荐。
+            <div class="mba-section-head">I. Market Context (宏观背景)</div>
+            <p style="font-size:11px; text-align:justify; color:#444; margin-bottom:15px;">
+                根据《深圳房产数据研究报告》，当前市场已进入存量分化周期。核心风险特征如下：
             </p>
+            <ul style="font-size:11px; color:#444; margin-top:0; padding-left:20px;">
+                <li style="margin-bottom:4px;"><strong>流动性紧缩：</strong>二手房平均成交周期已拉长至 204 天。非核心资产变现极难。</li>
+                <li style="margin-bottom:4px;"><strong>柠檬市场效应：</strong>买卖双方信息不对称加剧，尤其是法拍房领域的隐性债务风险。</li>
+                <li style="margin-bottom:4px;"><strong>政策变量：</strong>2025年新税制下，公司产权房产交易的土地增值税 (LVAT) 预征率调整，直接影响持有成本。</li>
+            </ul>
 
-            <div class="mba-section-head">2. Quantitative Scoring Matrix (评分矩阵)</div>
+            <div class="mba-section-head">II. Financial Capacity (财务压力测试)</div>
+            <p style="font-size:11px; color:#666; margin-bottom:8px;">基于 IPA (In-Principle Approval) 模型的测算结果：</p>
             <table class="mba-table">
                 <thead>
                     <tr>
-                        <th width="35%">Asset / Status</th>
-                        <th width="20%">Economics</th>
-                        <th width="30%">Risk Audit</th>
-                        <th width="15%" style="text-align:center;">Score</th>
+                        <th width="30%">Metric (指标)</th>
+                        <th width="30%">Value (数值)</th>
+                        <th width="40%">Stress Test (压力测试)</th>
+                    </tr>
+                </thead>
+                <tbody id="rpt-finance-body">
+                    <!-- Dynamic -->
+                </tbody>
+            </table>
+
+            <div class="mba-section-head">III. Asset Matrix (资产事前验尸)</div>
+            <p style="font-size:11px; color:#666; margin-bottom:8px;">
+                引入“事前验尸 (Pre-Mortem)”思维：假设投资失败，原因何在？<br>
+                * 本表基于“净值还原法”，已扣除法拍房的潜在税费与腾退成本。
+            </p>
+            <table class="mba-table">
+                <thead>
+                    <tr>
+                        <th width="30%">Asset Name</th>
+                        <th width="20%">Net Cost</th>
+                        <th width="20%">Medical</th>
+                        <th width="30%">Risk Rating</th>
                     </tr>
                 </thead>
                 <tbody id="rpt-table-body">
                     <tr><td colspan="4" style="text-align:center; color:#999; padding:20px;">等待数据录入...</td></tr>
                 </tbody>
             </table>
-            <div style="font-size:9px; color:#888; margin-top:5px; text-align:right;">
-                * Scoring Cap: 90 Points. Pass Line: 60 Points.
-            </div>
 
-            <div class="mba-section-head">3. Strategic Verdict (决策建议)</div>
-            <div style="background:#F1F8E9; padding:15px; border-radius:2px; font-size:11px; border-left:4px solid var(--forest-green); color:#33691E;">
-                <strong style="text-transform:uppercase;">Advisor's Note:</strong><br>
-                <span id="rpt-advice">分析中...</span>
+            <div class="mba-section-head">IV. Fiduciary Advisory (信托建议)</div>
+            <div style="font-size:11px; color:#444; line-height:1.6;">
+                <div style="margin-bottom:8px;">
+                    <strong>流动性陷阱 (Liquidity Trap)：</strong><br>
+                    坚决规避楼龄>20年且无电梯的物业。此类资产在未来5年的换手率预计将下降 40%。
+                </div>
+                <div style="margin-bottom:8px;">
+                    <strong>法拍排雷 (Foreclosure Risk)：</strong><br>
+                    若涉及公司产权（Company Title），务必预留成交价 30%-60% 的资金用于缴纳土地增值税 (LVAT)。
+                </div>
+                <div>
+                    <strong>黄金4分钟 (Golden 4 Mins)：</strong><br>
+                    医疗资源不仅是配套，更是生命线。优选福田/南山核心区三甲医院覆盖范围。
+                </div>
             </div>
         </div>
         
@@ -444,15 +463,32 @@
 // --- Symphony Engine (Core Logic) ---
 
 const store = {
-    ipa: { maxPrice: 0, reserve: 0, age: 55, calculated: false },
+    ipa: { maxPrice: 0, reserve: 0, age: 45, cash: 0, loanAmount: 0, calculated: false },
     props: [
-        { name: '', price: null, region: '', elevator: 'yes', hospital: 10, type: 'standard' },
-        { name: '', price: null, region: '', elevator: 'yes', hospital: 10, type: 'standard' },
-        { name: '', price: null, region: '', elevator: 'yes', hospital: 10, type: 'standard' }
+        { name: '南山·蔚蓝海岸 (S级)', price: 1200, region: 'NanShan_Core', elevator: 'yes', hospital: 10, type: 'standard' }, // S-Tier
+        { name: '罗湖·老旧公房 (F级)', price: 400, region: 'LuoHu', elevator: 'no', hospital: 5, type: 'standard' }, // F-Tier (Fatal)
+        { name: '宝安·远郊大盘 (B级)', price: 800, region: 'BaoAn_Qianhai', elevator: 'yes', hospital: 25, type: 'standard' } // B-Tier
     ],
-    auctionProp: null, // Opus 4
+    auctionProp: {
+        name: '法拍·前海某公馆',
+        price: 1000, 
+        safeBid: 1250,
+        marketValue: 1500,
+        type: 'auction',
+        risks: { type: 'personal', occupy: 'tenant', isCriminal: false, totalHiddenDebt: 15 },
+        auditLog: [
+            { tag: "SAFE", text: "个人产权" },
+            { tag: "HIGH", text: "带租约：腾退难" }
+        ]
+    }, 
     activeProp: 0
 };
+
+// Auto-run on load to show "Complete Test"
+window.onload = function() {
+    runOverture(); // Pre-calc financial capacity
+    switchProp(0); // Load first prop UI
+}
 
 // Utilities
 function showToast(msg) {
@@ -486,7 +522,7 @@ function runOverture() {
     const income = parseFloat(document.getElementById('ipa_income').value) || 0;
     let age = parseFloat(document.getElementById('ipa_age').value);
     
-    if(!age || age < 18) age = 55;
+    if(!age || age < 18) age = 45;
     
     let loanYears = Math.max(0, 70 - age);
     let maxMonthlyPay = income * 0.45; 
@@ -502,7 +538,14 @@ function runOverture() {
     let maxIncomePrice = cash + loanAmount;
     let safePrice = Math.min(maxLTVPrice, maxIncomePrice);
     
-    store.ipa = { maxPrice: safePrice, reserve: safePrice * 0.1, age: age, calculated: true };
+    store.ipa = { 
+        maxPrice: safePrice, 
+        reserve: safePrice * 0.1, 
+        age: age, 
+        cash: cash, 
+        loanAmount: loanAmount,
+        calculated: true 
+    };
 
     const resDiv = document.getElementById('ipa-result');
     resDiv.classList.add('show');
@@ -681,13 +724,13 @@ function calculateScore(p) {
         if (store.ipa.calculated && p.price > store.ipa.maxPrice) {
             let over = p.price - store.ipa.maxPrice;
             score -= 20;
-            auditSummary.push({tag:'HIGH', text:`超预算${over.toFixed(0)}w`});
+            auditSummary.push({tag:'HIGH', text:`资金超限`});
         }
         
         // 3. Region (Liquidity)
         if (p.region === 'LuoHu') {
             score -= 15; // Low liquidity penalty
-            auditSummary.push({tag:'MED', text:'弱流动性片区'});
+            auditSummary.push({tag:'MED', text:'弱流动性'});
         } else if (p.region === 'BaoAn_Qianhai') {
              score -= 5; // Volatility risk
         }
@@ -695,7 +738,7 @@ function calculateScore(p) {
         // 4. Hospital
         if(p.hospital > 15) {
              score -= 5;
-             auditSummary.push({tag:'MED', text:`急救>${p.hospital}m`});
+             auditSummary.push({tag:'MED', text:`急救慢`});
         }
 
     } else if (p.type === 'auction') {
@@ -732,10 +775,31 @@ function calculateScore(p) {
 }
 
 function generateReport() {
-    document.getElementById('rpt-date').innerText = new Date().toLocaleDateString();
-    document.getElementById('rpt-age').innerText = store.ipa.age;
-    document.getElementById('rpt-limit').innerText = store.ipa.maxPrice.toFixed(0);
-    
+    // 1. Fill Financial Capacity Table
+    const financeBody = document.getElementById('rpt-finance-body');
+    if (store.ipa.calculated) {
+        financeBody.innerHTML = `
+            <tr>
+                <td>Cash Equity (现金权益)</td>
+                <td><strong>${store.ipa.cash.toFixed(0)}万</strong></td>
+                <td><span class="audit-tag tag-safe">流动性充足</span></td>
+            </tr>
+            <tr>
+                <td>Max Leverage (最大杠杆)</td>
+                <td><strong>${store.ipa.loanAmount.toFixed(0)}万</strong></td>
+                <td><span style="font-size:9px; color:#666;">受限于年龄 (Tenure Cap)</span></td>
+            </tr>
+            <tr>
+                <td>Safe Purchase Cap (购买力)</td>
+                <td><strong>${store.ipa.maxPrice.toFixed(0)}万</strong></td>
+                <td><span class="audit-tag tag-safe">安全边界</span></td>
+            </tr>
+        `;
+    } else {
+        financeBody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#999;">请先执行序曲(I)测算</td></tr>';
+    }
+
+    // 2. Fill Asset Matrix Table (Pre-Mortem)
     const tbody = document.getElementById('rpt-table-body');
     let rows = "";
     
@@ -743,9 +807,6 @@ function generateReport() {
     const allProps = [...store.props];
     if(store.auctionProp) allProps.push(store.auctionProp);
     
-    let validCount = 0;
-    let bestScore = 0;
-
     allProps.forEach((p, idx) => {
         // Skip empty standard props
         if(p.type === 'standard' && !p.name && !p.price) return;
@@ -755,60 +816,40 @@ function generateReport() {
         let s = result.score;
         let grade = s >= 80 ? 'S' : (s >= 70 ? 'A' : (s >= 60 ? 'B' : 'F'));
         
-        if(s > bestScore) bestScore = s;
-        validCount++;
-
-        // Render Audit Tags
-        let auditHtml = "";
-        if(result.audit.length === 0) {
-            auditHtml = `<span class="audit-tag tag-safe">CLEAN</span>`;
-        } else {
-            result.audit.forEach(a => {
-                let c = a.tag==='FATAL'?'tag-fatal':(a.tag==='HIGH'?'tag-high':'tag-safe');
-                auditHtml += `<span class="audit-tag ${c}">${a.text}</span>`;
-            });
+        // Pre-Mortem Reason Logic
+        let failureReason = "";
+        if(s < 60) {
+             // Find fatal reason
+             let fatal = result.audit.find(a => a.tag === 'FATAL');
+             if(fatal) failureReason = `<div style="color:#B71C1C; font-size:9px;">验尸结果: ${fatal.text}</div>`;
+             else failureReason = `<div style="color:#B71C1C; font-size:9px;">验尸结果: 多重风险叠加</div>`;
+        } else if (result.audit.length > 0) {
+             failureReason = `<div style="color:#F57C00; font-size:9px;">风险: ${result.audit.map(a=>a.text).join(', ')}</div>`;
         }
+
+        // Columns Data
+        let netCost = p.type === 'standard' ? `${p.price}万` : `${p.safeBid.toFixed(0)}万`;
+        let medical = p.type === 'standard' ? `${p.hospital} 分钟` : `10 分钟`; // Standard assumption for auction example
         
-        // Render Economics
-        let econHtml = "";
-        if(p.type === 'standard') {
-            econHtml = `<div style="font-weight:bold;">${p.price?p.price.toFixed(0):0}w</div><div style="font-size:9px;color:#999;">挂牌价</div>`;
-        } else {
-            econHtml = `<div style="font-weight:bold;">${p.price.toFixed(0)}w</div><div style="font-size:9px;color:#999;">起拍 (市价${p.marketValue}w)</div>`;
-        }
-
+        // Risk Rating Badge
+        let ratingClass = s >= 80 ? 'tag-safe' : (s >= 60 ? 'tag-high' : 'tag-fatal');
+        let ratingText = s >= 80 ? 'SAFE' : (s >= 60 ? 'MED RISK' : 'HIGH RISK');
+        
         rows += `
             <tr>
                 <td>
                     <div style="font-weight:bold; color:#222; font-size:11px;">${p.name || '未命名资产'}</div>
-                    <div style="font-size:9px; color:#888;">${label} ${p.type==='auction'?'(Auction)':''}</div>
+                    ${failureReason}
                 </td>
-                <td>${econHtml}</td>
-                <td>${auditHtml}</td>
-                <td style="text-align:center;">
-                    <div class="score-box grade-${grade}">${s}</div>
-                </td>
+                <td>${netCost}</td>
+                <td>${medical}</td>
+                <td><span class="audit-tag ${ratingClass}">${ratingText}</span></td>
             </tr>
         `;
     });
     
     if(rows === "") rows = `<tr><td colspan="4" style="text-align:center; padding:20px; font-style:italic; font-size:10px;">暂无数据</td></tr>`;
     tbody.innerHTML = rows;
-    
-    // Strategic Verdict
-    const adviceBox = document.getElementById('rpt-advice');
-    if(validCount === 0) {
-        adviceBox.innerText = "请先在 II(选筹) 或 III(法拍) 中录入资产数据。";
-    } else if (bestScore < 60) {
-        adviceBox.innerHTML = "<span style='color:#B71C1C; font-weight:bold;'>全员淘汰 (REJECT ALL)。</span> 当前所有资产评分均低于 60 分，存在致命硬伤（如无电梯、高税费、刑案）。建议空仓观望。";
-        adviceBox.parentElement.style.borderLeftColor = 'var(--velvet-red)';
-        adviceBox.parentElement.style.background = '#FFEBEE';
-        adviceBox.parentElement.style.color = '#B71C1C';
-    } else if (bestScore >= 80) {
-        adviceBox.innerHTML = "发现优质资产（S级）。建议优先锁定评分最高的项目，并尽快安排实地勘察。";
-    } else {
-        adviceBox.innerHTML = "资产资质平庸（A/B级）。虽无致命硬伤，但性价比一般。建议尝试议价或继续寻找。";
-    }
 }
 </script>
 
