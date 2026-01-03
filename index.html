@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>深圳购房决策系统 - 移动版</title>
+    <style>
+        :root {
+            --bg-paper: #F9F7F2;
+            --bg-card: #FFFFFF;
+            --text-primary: #2C3E50;
+            --text-secondary: #5D6D7E;
+            --text-muted: #95A5A6;
+            --accent-main: #556B2F; /* 浅墨绿 */
+            --accent-soft: #8FBC8F;
+            --accent-light: #E8F5E9;
+            --line-color: #E0E0E0;
+            --highlight: #EAECEE;
+            --risk-color: #D35400;
+            --safe-color: #27AE60;
+            
+            --spacing-unit: 16px;
+            --border-radius: 8px; 
+            --sidebar-width: 260px;
+            --bottom-nav-height: 60px;
+        }
+
+        * {
+            box-sizing: border-box;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-paper);
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            font-size: 16px; /* 防止iOS输入框放大 */
+            padding-bottom: calc(var(--bottom-nav-height) + 20px); /* 为底部导航留空 */
+        }
+
+        /* 布局框架 */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        /* 顶部标题栏 (Mobile Only) */
+        .mobile-header {
+            background: var(--bg-paper);
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mobile-brand {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .mobile-status {
+            font-size: 12px;
+            color: var(--text-secondary);
+            background: #EEE;
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+
+        /* 桌面侧边栏 (响应式隐藏) */
+        .nav-sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--bg-paper);
+            border-right: 1px solid var(--line-color);
+            padding: 20px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 10;
+        }
+
+        /* 底部导航 (Mobile Only) */
+        .mobile-bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: var(--bottom-nav-height);
+            background: #FFF;
+            border-top: 1px solid var(--line-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 10px;
+            z-index: 100;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            overflow-x: auto;
+            white-space: nowrap;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .mobile-bottom-nav::-webkit-scrollbar { display: none; }
+
+        .nav-tab {
+            padding: 0 15px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 10px;
+            color: var(--text-muted);
+            min-width: 60px;
+            cursor: pointer;
+        }
+
+        .nav-tab.active {
+            color: var(--accent-main);
+            font-weight: 600;
+        }
+        
+        .nav-tab-icon {
+            font-size: 18px;
+            margin-bottom: 2px;
+            font-family: serif;
+            font-style: italic;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            margin-right: 240px; /* Decision sidebar width */
+            padding: 30px 40px;
+            max-width: 900px;
+        }
+
+        /* 右侧决策边栏 */
+        .decision-sidebar {
+            width: 240px;
+            background-color: #FDFEFE;
+            border-left: 1px solid var(--line-color);
+            padding: 24px;
+            position: fixed;
+            right: 0;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 9;
+        }
+
+        /* 移动端覆盖样式 */
+        @media (max-width: 1024px) {
+            .nav-sidebar { display: none; }
+            .decision-sidebar { display: none; } /* 默认隐藏，改为底部摘要条 */
+            .main-content { margin: 0; padding: 15px; width: 100%; }
+        }
+
+        /* 乐章卡片 */
+        .movement-section {
+            background: var(--bg-card);
+            padding: 24px;
+            margin-bottom: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+        
+        .movement-section.active-section { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0 0 5px 0;
+        }
+
+        .section-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 1px dashed var(--line-color);
+        }
+
+        /* 表单样式优化 */
+        .form-group { margin-bottom: 20px; }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        input[type="text"], input[type="number"], select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--line-color);
+            background: #FAFAFA;
+            border-radius: 6px;
+            font-size: 16px; /* Mobile friendly */
+            -webkit-appearance: none; /* iOS Reset */
+        }
+        
+        input:focus { border-color: var(--accent-main); background: #FFF; }
+
+        .btn {
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 15px;
+            width: 100%; /* Mobile: Full width buttons */
+            margin-bottom: 10px;
+            border: 1px solid var(--line-color);
+            background: #FFF;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        
+        .btn-primary {
+            background: var(--text-primary);
+            color: #FFF;
+            border: none;
+        }
+
+        /* 地图样式 */
+        .map-container {
+            width: 100%;
+            background: #EAF2F8;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #D6EAF8;
+        }
+        
+        .map-label {
+            text-align: center;
+            font-size: 12px;
+            color: #5D6D7E;
+            margin-bottom: 5px;
+        }
+
+        .sz-map-svg {
+            width: 100%;
+            height: auto;
+            display: block;
+            filter: drop-shadow(0 2px 3px rgba(0,0,0,0.1));
+        }
+
+        .district-path {
+            fill: #FFF;
+            stroke: #34495E;
+            stroke-width: 1;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .district-path:hover, .district-path.active {
+            fill: var(--accent-main);
+            stroke: #FFF;
+        }
+
+        .district-text {
+            pointer-events: none;
+            font-size: 8px;
+            fill: #34495E;
+            text-anchor: middle;
+            font-weight: bold;
+        }
+        
+        .district-path.active + .district-text, 
+        .district-path:hover + .district-text {
+            fill: #FFF;
+        }
+
+        /* 房源 Tabs - 滑动式 */
+        .prop-tabs {
+            display: flex;
+            background: #F0F0F0;
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 20px;
+        }
+
+        .prop-tab {
+            flex: 1;
+            text-align: center;
+            padding: 8px 0;
+            font-size: 14px;
+            border-radius: 6px;
+            color: var(--text-secondary);
+        }
+
+        .prop-tab.active {
+            background: #FFF;
+            color: var(--accent-main);
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* 移动端摘要浮层 (Mini Decision Sidebar) */
+        .mobile-summary-bar {
+            position: fixed;
+            bottom: var(--bottom-nav-height); /* Above nav */
+            left: 0;
+            width: 100%;
+            background: rgba(44, 62, 80, 0.95);
+            color: #FFF;
+            padding: 8px 15px;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 90;
+            backdrop-filter: blur(5px);
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .mobile-summary-content {
+            display: none; /* Initially hidden */
+            position: fixed;
+            bottom: calc(var(--bottom-nav-height) + 36px);
+            left: 0;
+            width: 100%;
+            background: #FFF;
+            padding: 20px;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            z-index: 89;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        /* 打印样式 */
+        @media print {
+            .mobile-bottom-nav, .mobile-summary-bar, .mobile-header { display: none; }
+            .movement-section { display: block; border: none; box-shadow: none; }
+            .main-content { margin: 0; padding: 0; }
+            body { padding-bottom: 0; background: #FFF; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- 移动端顶部 -->
+    <div class="mobile-header">
+        <div class="mobile-brand">深圳购房决策</div>
+        <div class="mobile-status" id="header-status">准备中</div>
+    </div>
+
+    <!-- 桌面侧边栏 (大屏显示) -->
+    <nav class="nav-sidebar">
+        <div style="font-size:20px; font-weight:bold; margin-bottom:20px;">乐章目录</div>
+        <ul style="list-style:none; padding:0; line-height:2.5;">
+            <li onclick="navTo(0)" style="cursor:pointer">I. 买方画像</li>
+            <li onclick="navTo(1)" style="cursor:pointer">II. 房源录入</li>
+            <li onclick="navTo(2)" style="cursor:pointer">III. Truth Layer</li>
+            <li onclick="navTo(3)" style="cursor:pointer">IV. 出价概率</li>
+            <li onclick="navTo(4)" style="cursor:pointer">V. 对比排序</li>
+            <li onclick="navTo(5)" style="cursor:pointer">VI. 风险前置</li>
+            <li onclick="navTo(6)" style="cursor:pointer">VII. 决策时机</li>
+            <li onclick="navTo(7)" style="cursor:pointer">Fin. 报告</li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <!-- I. 画像 -->
+        <section id="section-0" class="movement-section active-section">
+            <h2 class="section-title">I. 买方画像</h2>
+            <div class="section-desc">第一乐章：用真实的月供能力定义预算边界。</div>
+
+            <div class="form-group">
+                <label>购房目的</label>
+                <select id="p_purpose">
+                    <option value="self">刚需自住</option>
+                    <option value="improve">改善置换</option>
+                    <option value="invest">投资保值</option>
+                </select>
+            </div>
+
+            <div style="display:flex; gap:10px;">
+                <div class="form-group" style="flex:1">
+                    <label>预算上限(万)</label>
+                    <input type="number" id="p_budget" value="500">
+                </div>
+                <div class="form-group" style="flex:1">
+                    <label>首付比例(%)</label>
+                    <input type="number" id="p_downpay_pct" value="30">
+                </div>
+            </div>
+
+            <div style="display:flex; gap:10px;">
+                <div class="form-group" style="flex:1">
+                    <label>月供上限(元)</label>
+                    <input type="number" id="p_monthly_max" value="20000">
+                </div>
+                <div class="form-group" style="flex:1">
+                    <label>年限</label>
+                    <select id="p_loan_years">
+                        <option value="30">30年</option>
+                        <option value="20">20年</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>风险偏好</label>
+                <select id="p_risk_profile">
+                    <option value="balanced">均衡 (推荐)</option>
+                    <option value="conservative">保守</option>
+                    <option value="aggressive">进取</option>
+                </select>
+            </div>
+
+            <button class="btn btn-primary" onclick="calcPersona()">生成画像 & 下一步</button>
+            <div id="persona-result" style="margin-top:15px; padding:15px; background:var(--accent-light); border-radius:6px; font-size:14px; display:none;"></div>
+        </section>
+
+        <!-- II. 房源录入 (带地图) -->
+        <section id="section-1" class="movement-section">
+            <h2 class="section-title">II. 房源录入</h2>
+            <div class="section-desc">第二乐章：点击地图快速填入区域。</div>
+
+            <div class="prop-tabs">
+                <div class="prop-tab active" onclick="switchPropTab(0)">房源 A</div>
+                <div class="prop-tab" onclick="switchPropTab(1)">房源 B</div>
+                <div class="prop-tab" onclick="switchPropTab(2)">房源 C</div>
+            </div>
+            
+            <!-- 深圳交互地图 SVG -->
+            <div class="map-container">
+                <div class="map-label">👇 点击区域自动填充热度与参考值</div>
+                <svg viewBox="0 0 400 200" class="sz-map-svg">
+                    <!-- 简化的深圳地图路径 -->
+                    <!-- 宝安 + 光明 -->
+                    <path d="M40,20 L100,20 L110,60 L80,120 L20,100 Z" class="district-path" onclick="selectDistrict('光明', 60, 4.5)" id="map-gm"></path>
+                    <text x="70" y="60" class="district-text">光明</text>
+
+                    <path d="M20,100 L80,120 L90,150 L60,190 L10,140 Z" class="district-path" onclick="selectDistrict('宝安', 70, 7.0)" id="map-ba"></path>
+                    <text x="50" y="150" class="district-text">宝安</text>
+
+                    <!-- 龙华 -->
+                    <path d="M100,40 L160,40 L160,90 L110,90 Z" class="district-path" onclick="selectDistrict('龙华', 75, 6.0)" id="map-lh"></path>
+                    <text x="135" y="70" class="district-text">龙华</text>
+                    
+                    <!-- 南山 -->
+                    <path d="M80,120 L110,90 L150,120 L150,180 L60,190 Z" class="district-path" onclick="selectDistrict('南山', 85, 11.0)" id="map-ns"></path>
+                    <text x="115" y="150" class="district-text">南山</text>
+
+                    <!-- 福田 -->
+                    <path d="M150,120 L190,120 L200,170 L150,180 Z" class="district-path" onclick="selectDistrict('福田', 80, 9.0)" id="map-ft"></path>
+                    <text x="175" y="150" class="district-text">福田</text>
+
+                    <!-- 罗湖 -->
+                    <path d="M190,110 L230,110 L230,160 L200,170 Z" class="district-path" onclick="selectDistrict('罗湖', 60, 5.5)" id="map-lu"></path>
+                    <text x="215" y="140" class="district-text">罗湖</text>
+                    
+                    <!-- 盐田 -->
+                    <path d="M230,120 L270,120 L260,150 L230,160 Z" class="district-path" onclick="selectDistrict('盐田', 50, 5.0)" id="map-yt"></path>
+                    <text x="250" y="140" class="district-text">盐田</text>
+
+                    <!-- 龙岗 -->
+                    <path d="M160,20 L280,20 L280,110 L190,110 L160,90 Z" class="district-path" onclick="selectDistrict('龙岗', 65, 4.2)" id="map-lg"></path>
+                    <text x="220" y="70" class="district-text">龙岗</text>
+
+                    <!-- 坪山 -->
+                    <path d="M280,30 L350,30 L340,100 L280,110 Z" class="district-path" onclick="selectDistrict('坪山', 55, 3.8)" id="map-ps"></path>
+                    <text x="310" y="70" class="district-text">坪山</text>
+
+                    <!-- 大鹏 -->
+                    <path d="M280,110 L340,100 L380,160 L320,190 Z" class="district-path" onclick="selectDistrict('大鹏', 40, 3.5)" id="map-dp"></path>
+                    <text x="330" y="150" class="district-text">大鹏</text>
+                </svg>
+            </div>
+
+            <div id="prop-form-container">
+                <!-- 动态生成 -->
+            </div>
+            
+            <button class="btn btn-primary" onclick="analyzeProp()">分析本房源</button>
+            <div id="prop-analysis-result"></div>
+        </section>
+
+        <!-- III. Truth Layer -->
+        <section id="section-2" class="movement-section">
+            <h2 class="section-title">III. Truth Layer</h2>
+            <div class="section-desc">去除中介滤镜，进行人工校验。</div>
+            <div class="prop-tabs">
+                <div class="prop-tab active" onclick="switchTruthTab(0)">A</div>
+                <div class="prop-tab" onclick="switchTruthTab(1)">B</div>
+                <div class="prop-tab" onclick="switchTruthTab(2)">C</div>
+            </div>
+            <div id="truth-container"></div>
+        </section>
+
+        <!-- IV. 出价 -->
+        <section id="section-3" class="movement-section">
+            <h2 class="section-title">IV. 出价与概率</h2>
+            <div class="form-group">
+                 <select id="bid_prop_select" onchange="calcBidProb()">
+                     <option value="0">房源 A</option>
+                     <option value="1">房源 B</option>
+                     <option value="2">房源 C</option>
+                 </select>
+            </div>
+            <div style="background:#F9F9F9; padding:10px; border-radius:6px; margin-bottom:15px;">
+                <div style="display:flex; gap:10px;">
+                    <div style="flex:1">
+                        <label style="font-size:12px;">去化速度</label>
+                        <select id="market_speed" onchange="calcBidProb()" style="padding:5px;">
+                            <option value="slow">慢</option>
+                            <option value="medium" selected>中</option>
+                            <option value="fast">快</option>
+                        </select>
+                    </div>
+                    <div style="flex:1">
+                        <label style="font-size:12px;">竞品压力</label>
+                        <select id="market_comp" onchange="calcBidProb()" style="padding:5px;">
+                            <option value="low">低</option>
+                            <option value="medium" selected>中</option>
+                            <option value="high">高</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div id="bid-results-container"></div>
+        </section>
+        
+        <!-- V. 对比 -->
+        <section id="section-4" class="movement-section">
+            <h2 class="section-title">V. 评分对比</h2>
+            <div style="display:flex; gap:5px; margin-bottom:15px;">
+                <button class="btn" style="flex:1; font-size:12px; padding:8px;" onclick="setWeights('commute')">通勤优先</button>
+                <button class="btn" style="flex:1; font-size:12px; padding:8px;" onclick="setWeights('finance')">资金压力</button>
+            </div>
+            <div id="comparison-chart"></div>
+        </section>
+
+        <!-- VI. 风险 -->
+        <section id="section-5" class="movement-section">
+            <h2 class="section-title">VI. 风险前置</h2>
+            <div id="risk-checklist"></div>
+        </section>
+        
+        <!-- VII. 时机 -->
+        <section id="section-6" class="movement-section">
+            <h2 class="section-title">VII. 决策时机</h2>
+            <div class="form-group">
+                <label>当下情绪</label>
+                <select id="emotion_state">
+                    <option value="calm">冷静/理性</option>
+                    <option value="anxious">焦虑/怕踏空</option>
+                    <option value="hesitant">犹豫/怕买贵</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" onclick="checkReadiness()">检测条件</button>
+            <div id="readiness-result" style="margin-top:10px;"></div>
+        </section>
+
+        <!-- Fin -->
+        <section id="section-7" class="movement-section">
+            <h2 class="section-title">Fin. 决策报告</h2>
+            <div id="final-report" style="white-space: pre-wrap; font-family:monospace; font-size:12px; background:#F5F5F5; padding:15px; border-radius:6px; height:300px; overflow-y:auto;"></div>
+            <button class="btn btn-primary" style="margin-top:15px;" onclick="copyReport()">复制全文</button>
+        </section>
+
+        <div style="height:40px;"></div> <!-- Spacer -->
+    </main>
+
+    <!-- 底部移动端导航 -->
+    <nav class="mobile-bottom-nav">
+        <div class="nav-tab active" onclick="navTo(0)">
+            <div class="nav-tab-icon">I</div>
+            画像
+        </div>
+        <div class="nav-tab" onclick="navTo(1)">
+            <div class="nav-tab-icon">II</div>
+            录入
+        </div>
+        <div class="nav-tab" onclick="navTo(2)">
+            <div class="nav-tab-icon">III</div>
+            Truth
+        </div>
+        <div class="nav-tab" onclick="navTo(3)">
+            <div class="nav-tab-icon">IV</div>
+            出价
+        </div>
+        <div class="nav-tab" onclick="navTo(4)">
+            <div class="nav-tab-icon">V</div>
+            对比
+        </div>
+        <div class="nav-tab" onclick="navTo(5)">
+            <div class="nav-tab-icon">VI</div>
+            风险
+        </div>
+        <div class="nav-tab" onclick="navTo(6)">
+            <div class="nav-tab-icon">VII</div>
+            时机
+        </div>
+        <div class="nav-tab" onclick="navTo(7)">
+            <div class="nav-tab-icon">Fin</div>
+            报告
+        </div>
+    </nav>
+
+    <!-- 移动端摘要栏 -->
+    <div class="mobile-summary-bar" onclick="toggleSummary()">
+        <span id="mobile-budget-display">预算: 待计算</span>
+        <span style="font-size:10px; opacity:0.8;">▲ 决策面板</span>
+    </div>
+
+    <!-- 移动端详细面板 (抽屉) -->
+    <div class="mobile-summary-content" id="mobile-summary-drawer">
+        <h4 style="margin-top:0;">决策辅助面板</h4>
+        <div class="decision-card">
+            <div class="decision-label">财务校验</div>
+            <div id="sb-finance-check">待输入...</div>
+        </div>
+        <div class="decision-card">
+            <div class="decision-label">最稳妥选择</div>
+            <div id="sb-safest-choice" class="decision-value">--</div>
+        </div>
+        <div class="decision-card">
+            <div class="decision-label">最高风险</div>
+            <div id="sb-top-risk" class="risk-alert">--</div>
+        </div>
+        <button class="btn" onclick="toggleSummary()">关闭面板</button>
+    </div>
+
+</div>
+
+<script>
+// --- 核心逻辑 ---
+
+const store = {
+    persona: { purpose: 'self', budget: 500, downPay: 30, monthlyMax: 20000, loanYears: 30, risk: 'balanced' },
+    properties: [
+        { id:0, name:'房源 A', price:'', area:'', heat:50, age:10, metro:10, riskProp:'none', logs:[] },
+        { id:1, name:'房源 B', price:'', area:'', heat:50, age:10, metro:10, riskProp:'none', logs:[] },
+        { id:2, name:'房源 C', price:'', area:'', heat:50, age:10, metro:10, riskProp:'none', logs:[] }
+    ],
+    currentPropIndex: 0,
+    weights: { commute: 25, price: 25, loan: 20, liquidity: 20, risk: 10 }
+};
+
+window.onload = function() {
+    loadFromLocal();
+    renderPropForm();
+    updateSidebar();
+};
+
+function navTo(index) {
+    document.querySelectorAll('.movement-section').forEach(el => el.classList.remove('active-section'));
+    document.getElementById('section-' + index).classList.add('active-section');
+    
+    document.querySelectorAll('.nav-tab').forEach((el, i) => {
+        el.className = i === index ? 'nav-tab active' : 'nav-tab';
+    });
+
+    window.scrollTo(0, 0);
+
+    // Auto-actions
+    if(index === 3) calcBidProb();
+    if(index === 4) renderComparison();
+    if(index === 5) renderRiskList();
+    if(index === 7) generateReport();
+}
+
+function toggleSummary() {
+    const drawer = document.getElementById('mobile-summary-drawer');
+    const display = drawer.style.display;
+    drawer.style.display = display === 'block' ? 'none' : 'block';
+}
+
+// --- I. 画像 ---
+function calcPersona() {
+    const p = store.persona;
+    p.purpose = document.getElementById('p_purpose').value;
+    p.budget = parseFloat(document.getElementById('p_budget').value) || 0;
+    p.downPay = parseFloat(document.getElementById('p_downpay_pct').value) || 30;
+    p.monthlyMax = parseFloat(document.getElementById('p_monthly_max').value) || 0;
+    p.loanYears = parseInt(document.getElementById('p_loan_years').value);
+    p.risk = document.getElementById('p_risk_profile').value;
+
+    const rate = 3.5; // 模拟年化
+    const monthlyRate = rate / 100 / 12;
+    const months = p.loanYears * 12;
+    const factor = (monthlyRate * Math.pow(1+monthlyRate, months)) / (Math.pow(1+monthlyRate, months)-1);
+    
+    // 反推
+    const loanMax = p.monthlyMax / factor; 
+    const totalMax = loanMax / (1 - p.downPay/100) / 10000; // 万
+    const safeTotal = Math.min(p.budget, totalMax);
+
+    const el = document.getElementById('persona-result');
+    el.style.display = 'block';
+    el.innerHTML = `
+        <strong>月供倒推上限：</strong> ${totalMax.toFixed(0)} 万<br>
+        <strong>建议总价区间：</strong> ${(safeTotal*0.85).toFixed(0)} - ${safeTotal.toFixed(0)} 万<br>
+        <div style="font-size:12px; color:#666; margin-top:5px;">已自动保存。请进入下一章录入房源。</div>
+    `;
+    
+    saveToLocal();
+    updateSidebar();
+    
+    // 自动跳转提示
+    setTimeout(() => { if(confirm("画像已生成，是否前往录入房源？")) navTo(1); }, 500);
+}
+
+// --- II. 房源 & 地图 ---
+function switchPropTab(idx) {
+    store.currentPropIndex = idx;
+    renderPropForm();
+    document.querySelectorAll('.prop-tab').forEach((el, i) => {
+        el.className = i === idx ? 'prop-tab active' : 'prop-tab';
+    });
+}
+
+function selectDistrict(name, defaultHeat, priceRef) {
+    const prop = store.properties[store.currentPropIndex];
+    prop.area = name;
+    prop.heat = defaultHeat;
+    // 自动填入名字前缀
+    if(!prop.name || prop.name.indexOf(name) === -1) {
+        prop.name = name + " - ";
+    }
+    
+    // UI Feedback
+    document.querySelectorAll('.district-path').forEach(el => el.style.fill = '');
+    // 简单高亮
+    // alert("已选择：" + name + "\n热度预设：" + defaultHeat);
+    
+    renderPropForm();
+    saveToLocal();
+}
+
+function renderPropForm() {
+    const prop = store.properties[store.currentPropIndex];
+    const container = document.getElementById('prop-form-container');
+    
+    container.innerHTML = `
+        <div class="form-group">
+            <label>小区名称 / 区域</label>
+            <input type="text" value="${prop.name || ''}" placeholder="点击上方地图自动填写" onchange="updateProp('name', this.value)">
+        </div>
+        <div style="display:flex; gap:10px;">
+            <div class="form-group" style="flex:1">
+                <label>挂牌(万)</label>
+                <input type="number" value="${prop.price || ''}" onchange="updateProp('price', this.value)">
+            </div>
+            <div class="form-group" style="flex:1">
+                <label>热度(0-100)</label>
+                <input type="number" value="${prop.heat}" onchange="updateProp('heat', this.value)">
+            </div>
+        </div>
+        <div style="display:flex; gap:10px;">
+            <div class="form-group" style="flex:1">
+                <label>楼龄</label>
+                <input type="number" value="${prop.age}" onchange="updateProp('age', this.value)">
+            </div>
+            <div class="form-group" style="flex:1">
+                <label>地铁(分)</label>
+                <input type="number" value="${prop.metro}" onchange="updateProp('metro', this.value)">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>风险项</label>
+            <select onchange="updateProp('riskProp', this.value)">
+                <option value="none" ${prop.riskProp==='none'?'selected':''}>无 (红本商品房)</option>
+                <option value="suspicious" ${prop.riskProp==='suspicious'?'selected':''}>有抵押/纠纷</option>
+                <option value="high_tax" ${prop.riskProp==='high_tax'?'selected':''}>税费高</option>
+            </select>
+        </div>
+    `;
+}
+
+function updateProp(field, val) {
+    store.properties[store.currentPropIndex][field] = val;
+    saveToLocal();
+}
+
+function analyzeProp() {
+    const prop = store.properties[store.currentPropIndex];
+    if(!prop.price) return alert("请先填写价格");
+    
+    let score = 10;
+    if(prop.age > 20) score -= 2;
+    if(prop.metro > 15) score -= 2;
+    if(prop.riskProp !== 'none') score -= 3;
+    
+    document.getElementById('prop-analysis-result').innerHTML = `
+        <div style="padding:10px; background:#EEF; margin-top:10px; border-radius:4px;">
+            基础评分: <b>${score}/10</b><br>
+            <span style="font-size:12px; color:#666;">${prop.riskProp!=='none'?'注意：存在硬性风险扣分': '暂无硬伤'}</span>
+        </div>
+    `;
+    updateSidebar();
+}
+
+// --- III. Truth & Others (简化版) ---
+function switchTruthTab(idx) {
+    store.currentPropIndex = idx;
+    renderTruth();
+}
+
+function renderTruth() {
+    const prop = store.properties[store.currentPropIndex];
+    document.getElementById('truth-container').innerHTML = `
+        <div style="margin-bottom:10px;">
+            当前: <strong>${prop.name || '未命名'}</strong> | 挂牌: ${prop.price||0}万
+        </div>
+        <div class="form-group">
+            <label>人工修正价 (万)</label>
+            <input type="number" value="${prop.manualPrice||''}" placeholder="经纪人反馈/成交参考" onchange="updateProp('manualPrice', this.value)">
+        </div>
+        <div style="font-size:12px; color:#999;">* Truth Layer 旨在记录真实市场反馈，而非App估值。</div>
+    `;
+}
+
+// --- IV. 出价 ---
+function calcBidProb() {
+    const idx = document.getElementById('bid_prop_select').value;
+    const prop = store.properties[idx];
+    if(!prop || !prop.price) {
+        document.getElementById('bid-results-container').innerHTML = "请先选择有效房源";
+        return;
+    }
+    
+    const base = parseFloat(prop.manualPrice || prop.price);
+    const speed = document.getElementById('market_speed').value;
+    
+    // 简单算法
+    let discount = 0.95; // default balanced
+    if(speed === 'slow') discount = 0.92;
+    if(speed === 'fast') discount = 0.98;
+    
+    const offer = (base * discount).toFixed(0);
+    const prob = speed === 'fast' ? 40 : 70;
+    
+    document.getElementById('bid-results-container').innerHTML = `
+        <div style="padding:15px; border:1px solid #ddd; background:#fff; margin-top:10px;">
+            <div style="font-size:16px; font-weight:bold; color:var(--accent-main)">建议出价: ${offer} 万</div>
+            <div style="font-size:12px; color:#666;">预估成交概率: ${prob}% (基于${speed==='slow'?'买方':'卖方'}市场设定)</div>
+            <div style="margin-top:8px; font-size:13px;">
+                策略: ${speed==='fast'?'需果断，空间小':'可大胆试探，磨心态'}
+            </div>
+        </div>
+    `;
+}
+
+// --- V. 对比 ---
+function renderComparison() {
+    let html = '';
+    store.properties.forEach(p => {
+        if(p.price) {
+            // 简单分
+            let s = 100 - (p.age) - (p.metro); 
+            html += `<div style="margin-bottom:10px; padding:10px; background:#fff; border:1px solid #eee;">
+                <strong>${p.name}</strong>: ${s}分
+                <div style="background:#eee; height:5px; margin-top:5px;"><div style="width:${Math.min(s,100)}%; height:100%; background:var(--accent-main)"></div></div>
+            </div>`;
+        }
+    });
+    document.getElementById('comparison-chart').innerHTML = html || "无数据";
+}
+
+// --- VI. 风险 ---
+function renderRiskList() {
+    document.getElementById('risk-checklist').innerHTML = `
+        <label><input type="checkbox"> 我已实地考察噪音与光照</label>
+        <label><input type="checkbox"> 我已核实学位占用情况</label>
+        <label><input type="checkbox"> 备用金可覆盖6个月断供</label>
+    `;
+}
+
+// --- VII. 报告 & 系统 ---
+function checkReadiness() {
+    const state = document.getElementById('emotion_state').value;
+    const result = document.getElementById('readiness-result');
+    if(state === 'calm') result.innerHTML = "<span style='color:green'>状态良好，可以决策。</span>";
+    else result.innerHTML = "<span style='color:red'>情绪波动中，建议冷却24小时。</span>";
+}
+
+function generateReport() {
+    const p = store.persona;
+    let txt = `深圳购房决策报告\n----------------\n`;
+    txt += `预算: ${p.budget}万\n目的: ${p.purpose}\n\n`;
+    store.properties.forEach(prop => {
+        if(prop.price) txt += `[房源] ${prop.name}\n价格: ${prop.price}万\n区域: ${prop.area||'未知'}\n\n`;
+    });
+    txt += `生成时间: ${new Date().toLocaleString()}`;
+    document.getElementById('final-report').innerText = txt;
+}
+
+function copyReport() {
+    const t = document.getElementById('final-report').innerText;
+    navigator.clipboard.writeText(t).then(() => alert("已复制"));
+}
+
+function updateSidebar() {
+    const p = store.persona;
+    document.getElementById('mobile-budget-display').innerText = `预算: ${p.budget}万`;
+    document.getElementById('sb-finance-check').innerText = `月供上限 ${p.monthlyMax}/月`;
+    
+    // 查找最高风险
+    const risky = store.properties.find(r => r.riskProp === 'suspicious');
+    document.getElementById('sb-top-risk').innerText = risky ? `警惕: ${risky.name}` : "暂无高危";
+}
+
+function saveToLocal() { localStorage.setItem('sz_mobile_v1', JSON.stringify(store)); }
+function loadFromLocal() {
+    const d = localStorage.getItem('sz_mobile_v1');
+    if(d) {
+        const parsed = JSON.parse(d);
+        Object.assign(store.persona, parsed.persona);
+        if(parsed.properties) store.properties = parsed.properties;
+    }
+    // Restore UI values
+    document.getElementById('p_budget').value = store.persona.budget;
+}
+
+</script>
+</body>
+</html>
