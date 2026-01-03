@@ -1,550 +1,581 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>深圳购房决策系统 - 资产安全专业版</title>
+    <title>深圳购房决策系统 - MBA 深度报告版</title>
     <style>
         :root {
-            /* 专业配色：克制、理性、高可读性 */
-            --bg-paper: #F5F7FA;
+            --bg-paper: #F3F4F6;
             --bg-card: #FFFFFF;
-            --text-primary: #2C3E50;
-            --text-secondary: #607D8B;
-            --accent-main: #34495E; /* 深蓝灰，体现专业 */
-            --accent-light: #ECEFF1;
-            --highlight: #FFF8E1;
-            --risk-color: #D32F2F;
-            --safe-color: #388E3C;
-            
-            --spacing-unit: 16px;
-            --border-radius: 8px; /* 更锐利的圆角 */
-            --bottom-nav-height: 60px;
-            
-            --anim-speed: 0.5s;
+            --text-primary: #111827;
+            --text-secondary: #4B5563;
+            --accent-main: #1E3A8A; /* 麦肯锡蓝 */
+            --accent-gold: #B45309;
+            --risk-high: #DC2626;
+            --risk-safe: #059669;
+            --border-radius: 8px;
+            --nav-height: 60px;
         }
 
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         body {
             background-color: var(--bg-paper); color: var(--text-primary);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            line-height: 1.6; margin: 0; padding: 0; font-size: 16px;
-            padding-bottom: calc(var(--bottom-nav-height) + 30px);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6; margin: 0; padding: 0; font-size: 15px;
+            padding-bottom: calc(var(--nav-height) + 40px);
         }
 
-        /* 动效 */
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* 布局框架 */
+        .app-container { max-width: 900px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
+        .main-content { flex: 1; padding: 16px; }
+        @media(min-width: 768px) { .main-content { padding: 40px; } }
 
-        /* 布局 */
-        .app-container { display: flex; min-height: 100vh; flex-direction: column; }
-        .mobile-header {
+        /* 顶部导航 */
+        .header {
             background: #fff; padding: 15px 20px; position: sticky; top: 0; z-index: 50;
-            border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #E5E7EB; display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
-        .mobile-brand { font-size: 18px; font-weight: 700; color: var(--text-primary); letter-spacing: 0.5px; }
-        
-        .main-content { flex: 1; margin: 0 auto; padding: 20px; max-width: 900px; width: 100%; }
-        @media (min-width: 1025px) { .main-content { padding: 40px; } }
-
-        /* 卡片 */
-        .movement-section {
-            background: var(--bg-card); padding: 30px; margin-bottom: 20px; border-radius: var(--border-radius);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.03); display: none;
-            animation: fadeIn 0.4s ease-out forwards; border: 1px solid #eee;
+        .brand { font-size: 18px; font-weight: 800; color: var(--accent-main); letter-spacing: -0.5px; }
+        .status-badge { 
+            font-size: 11px; background: #DBEAFE; color: var(--accent-main); 
+            padding: 4px 8px; border-radius: 4px; font-weight: 600; 
         }
-        .movement-section.active-section { display: block; }
 
-        .section-title { font-size: 22px; font-weight: 600; color: var(--text-primary); margin: 0 0 10px 0; display: flex; align-items: center; }
+        /* 交互卡片 (Input Section) */
+        .input-section {
+            background: #fff; border-radius: var(--border-radius); padding: 24px; margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #E5E7EB;
+            display: none; animation: fadeIn 0.3s ease-out;
+        }
+        .input-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .section-title { 
+            font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; 
+            display: flex; align-items: center; gap: 8px;
+        }
         .section-desc { 
-            font-size: 14px; color: var(--text-secondary); margin-bottom: 25px; 
-            padding: 12px; background: var(--bg-paper); border-left: 3px solid var(--accent-main);
+            font-size: 13px; color: var(--text-secondary); background: #F9FAFB; 
+            padding: 12px; border-radius: 6px; margin-bottom: 20px; border-left: 3px solid var(--accent-main);
         }
 
-        /* 表单 */
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; color: var(--text-secondary); font-size: 14px; font-weight: 500; }
+        /* 表单控件 */
+        .form-group { margin-bottom: 16px; }
+        label { display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase; }
         input, select {
-            width: 100%; padding: 12px; border: 1px solid #CFD8DC; background: #fff;
-            border-radius: 6px; font-size: 16px; color: var(--text-primary); transition: 0.2s;
+            width: 100%; padding: 12px; border: 1px solid #D1D5DB; border-radius: 6px;
+            font-size: 15px; color: var(--text-primary); background: #fff; transition: 0.2s;
         }
-        input:focus, select:focus { border-color: var(--accent-main); box-shadow: 0 0 0 2px rgba(52, 73, 94, 0.1); }
+        input:focus, select:focus { border-color: var(--accent-main); ring: 2px solid #BFDBFE; }
 
+        /* 按钮 */
         .btn {
-            padding: 14px; border-radius: 6px; font-size: 15px; width: 100%; margin-bottom: 10px;
-            border: none; cursor: pointer; font-weight: 600; transition: all 0.2s;
+            display: block; width: 100%; padding: 14px; background: var(--accent-main); color: #fff;
+            border: none; border-radius: 6px; font-weight: 600; cursor: pointer; text-align: center;
+            transition: background 0.2s; margin-top: 10px;
         }
-        .btn-primary { background: var(--accent-main); color: #FFF; }
-        .btn-primary:hover { background: #2C3E50; box-shadow: 0 4px 12px rgba(44, 62, 80, 0.2); }
-        .btn-outline { border: 1px solid #CFD8DC; color: var(--text-secondary); background: transparent; }
-        .btn-outline.active { border-color: var(--accent-main); color: var(--accent-main); background: var(--accent-light); }
-        .btn-link { background: none; color: var(--accent-main); text-decoration: underline; padding: 0; width: auto; display: inline; font-weight: normal; }
+        .btn:hover { background: #1E40AF; }
+        .btn-secondary { background: #fff; color: var(--text-secondary); border: 1px solid #D1D5DB; }
+        .btn-group { display: flex; gap: 10px; margin-bottom: 20px; }
+        .btn-toggle { flex: 1; padding: 10px; font-size: 13px; background: #F3F4F6; color: #6B7280; border-radius: 6px; text-align: center; cursor: pointer; border: 1px solid transparent; }
+        .btn-toggle.active { background: #fff; color: var(--accent-main); border-color: #D1D5DB; font-weight: 700; shadow: 0 1px 2px rgba(0,0,0,0.05); }
 
-        /* IPA 结果 */
-        .ipa-card {
-            background: linear-gradient(145deg, #37474F 0%, #263238 100%);
-            color: #ECEFF1; padding: 25px; border-radius: 10px; margin-top: 20px; display: none;
+        /* MBA 报告样式 (核心升级) */
+        .mba-report {
+            background: #fff; padding: 40px; border: 1px solid #E5E7EB; 
+            font-family: "Times New Roman", "Songti SC", serif; color: #000;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
-        .ipa-val-big { font-size: 40px; font-weight: 700; line-height: 1.1; margin: 10px 0; color: #FFF; }
+        .watermark {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 80px; color: rgba(0,0,0,0.03); font-weight: 900; pointer-events: none; white-space: nowrap;
+        }
         
-        /* 地图 */
-        .map-container { background: #ECEFF1; border-radius: 8px; padding: 10px; margin-bottom: 20px; border: 1px solid #CFD8DC; }
-        .sz-map-svg { width: 100%; height: auto; display: block; filter: grayscale(20%); } /* 降低饱和度更显专业 */
-        .district-path { fill: #FFF; stroke: #546E7A; stroke-width: 1; cursor: pointer; transition: 0.2s; }
-        .district-path:hover, .district-path.active { fill: var(--text-secondary); stroke: #FFF; }
-        .district-text { pointer-events: none; font-size: 10px; fill: #37474F; font-weight: bold; }
-        .district-path.active + .district-text { fill: #FFF; }
+        .rep-header { text-align: center; border-bottom: 3px double #000; padding-bottom: 20px; margin-bottom: 30px; }
+        .rep-title { font-size: 24px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+        .rep-meta { font-size: 12px; color: #555; margin-top: 8px; font-style: italic; }
 
-        /* 底部导航 */
-        .mobile-bottom-nav {
-            position: fixed; bottom: 0; left: 0; width: 100%; height: var(--bottom-nav-height);
-            background: #FFF; border-top: 1px solid #EEE; display: flex; z-index: 100;
+        .rep-section { margin-bottom: 30px; }
+        .rep-h2 { 
+            font-size: 14px; font-weight: 800; text-transform: uppercase; border-bottom: 1px solid #000; 
+            padding-bottom: 4px; margin-bottom: 12px; display: flex; justify-content: space-between;
         }
-        .nav-tab {
+        
+        .rep-p { font-size: 14px; text-align: justify; margin-bottom: 10px; line-height: 1.6; }
+        .rep-highlight { background: #FEF3C7; padding: 2px 4px; }
+        
+        .rep-table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 15px 0; }
+        .rep-table th { border-bottom: 2px solid #000; text-align: left; padding: 6px; font-weight: 800; }
+        .rep-table td { border-bottom: 1px solid #ddd; padding: 8px 6px; }
+        
+        .risk-tag { font-size: 10px; font-weight: 700; padding: 2px 6px; border: 1px solid #000; text-transform: uppercase; }
+        .risk-tag.high { color: #DC2626; border-color: #DC2626; }
+        .risk-tag.safe { color: #059669; border-color: #059669; }
+
+        .reference-box {
+            font-size: 11px; color: #666; background: #F9FAFB; padding: 10px; 
+            border-left: 2px solid #9CA3AF; margin-top: 5px;
+        }
+
+        /* 底部 Tab */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: var(--nav-height);
+            background: #fff; border-top: 1px solid #E5E7EB; display: flex; z-index: 100;
+        }
+        .nav-btn {
             flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            font-size: 11px; color: #90A4AE; cursor: pointer;
+            font-size: 10px; color: #9CA3AF; cursor: pointer; transition: 0.2s;
         }
-        .nav-tab.active { color: var(--accent-main); font-weight: 600; }
-        .nav-tab-icon { font-size: 18px; margin-bottom: 3px; font-family: serif; }
+        .nav-btn.active { color: var(--accent-main); font-weight: 700; background: #F9FAFB; }
+        .nav-icon { font-size: 18px; margin-bottom: 2px; }
 
-        /* MBA 报告 */
-        .mba-report-container { 
-            border: 1px solid #CFD8DC; background: #fff; padding: 30px; 
-            font-family: 'Times New Roman', "Songti SC", serif; 
+        @media print {
+            .bottom-nav, .header, .input-section, .btn { display: none !important; }
+            .mba-report { display: block !important; border: none; box-shadow: none; padding: 0; }
+            body { padding: 0; background: #fff; }
         }
-        .mba-header { text-align: center; border-bottom: 2px solid #2C3E50; padding-bottom: 20px; margin-bottom: 25px; }
-        .mba-title { font-size: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #2C3E50; }
-        
-        .mba-section-title {
-            font-size: 14px; font-weight: bold; color: #2C3E50; text-transform: uppercase;
-            border-left: 3px solid #2C3E50; padding-left: 10px; margin: 25px 0 15px 0; background: #F5F7FA; padding: 8px 10px;
-        }
-
-        .mba-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px; }
-        .mba-table th { background: #37474F; color: #fff; padding: 10px; text-align: left; font-weight: normal; }
-        .mba-table td { border-bottom: 1px solid #EEE; padding: 10px; color: #455A64; }
-        
-        /* 标签 */
-        .tag { display: inline-block; padding: 3px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-right: 4px; border: 1px solid transparent; }
-        .tag-med { color: #0277BD; border-color: #0277BD; background: #E1F5FE; }
-        .tag-lift { color: #2E7D32; border-color: #2E7D32; background: #E8F5E9; }
-        .tag-warn { color: #C62828; border-color: #C62828; background: #FFEBEE; }
-
-        .white-paper-link {
-            display: block; margin-top: 15px; padding: 12px; background: #ECEFF1; 
-            color: #455A64; text-align: center; border-radius: 6px; text-decoration: none; font-size: 13px;
-            border: 1px dashed #B0BEC5; transition: 0.2s;
-        }
-        .white-paper-link:hover { background: #CFD8DC; color: #263238; }
-
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <div class="mobile-header">
-        <div class="mobile-brand">SZ.RealEstate.AI <span style="font-size:11px; font-weight:normal; background:#37474F; color:#fff; padding:2px 6px; border-radius:4px;">Pro</span></div>
-        <div style="font-size:11px; color:#78909C;">资产安全 · 信托责任 · 适老</div>
-    </div>
+    <header class="header">
+        <div class="brand">SZ.Decision.AI</div>
+        <div class="status-badge">MBA Pro Mode</div>
+    </header>
 
-    <main class="main-content">
-        <!-- I. IPA 评估 -->
-        <section id="section-0" class="movement-section active-section">
-            <h2 class="section-title">I. 财务安全边界评估 (IPA)</h2>
+    <div class="main-content">
+        
+        <!-- 1. IPA 模型 -->
+        <div id="view-ipa" class="input-section active">
+            <div class="section-title">📊 财务安全边界 (IPA Model)</div>
             <div class="section-desc">
-                基于<strong>《深圳购房AI决策系统白皮书》</strong>的风控模型：针对临近退休或主要依赖资产性收入的购房者，系统采用“压力测试”算法，优先计算极高安全垫下的购买力。
+                根据《白皮书》Ch3.1：对于资深购房者，我们采用“养老金覆盖率压力测试”。
+                <br><strong>核心逻辑：</strong>贷款年限受 (70-年龄) 限制，且必须预留“流动性储备金”。
             </div>
 
             <div class="form-group">
-                <label>现金权益 (Cash Equity) <span style="color:#C62828">*</span></label>
-                <input type="number" id="ipa_cash" value="400" placeholder="包括存款、理财变现、公积金余额 (万)">
+                <label>手头现金 (Liquid Equity) [万]</label>
+                <input type="number" id="ipa_cash" value="400">
             </div>
-
+            
             <div style="display:flex; gap:15px;">
                 <div class="form-group" style="flex:1">
-                    <label>月均现金流 (元)</label>
-                    <input type="number" id="ipa_income" value="15000" placeholder="退休金/租金/工资">
+                    <label>月收入/退休金 (元)</label>
+                    <input type="number" id="ipa_income" value="15000">
                 </div>
                 <div class="form-group" style="flex:1">
-                    <label>年龄 (影响贷款年限)</label>
-                    <input type="number" id="ipa_age" value="55" style="color:var(--text-primary); font-weight:bold;">
+                    <label>年龄 (Age)</label>
+                    <input type="number" id="ipa_age" value="55">
                 </div>
             </div>
 
-            <button class="btn btn-primary" onclick="runIPACalculation()">执行 IPA 压力测试</button>
-            
-            <div id="ipa-result-card" class="ipa-card">
-                <div style="font-size:12px; text-transform:uppercase; letter-spacing:1px; opacity:0.8;">Safe Purchasing Power</div>
-                <div class="ipa-val-big"><span id="ipa-max-price">0</span> <span style="font-size:20px;">万 (CNY)</span></div>
-                
-                <div style="margin-top:15px; display:flex; justify-content:space-between; border-top:1px solid rgba(255,255,255,0.2); padding-top:15px; font-size:13px;">
-                    <div>Equity (现金): <span id="val-cash" style="font-weight:bold;">0</span>万</div>
-                    <div>Debt (贷款): <span id="val-loan" style="font-weight:bold;">0</span>万</div>
-                </div>
-
-                <div style="margin-top:15px; padding:10px; background:rgba(0,0,0,0.2); border-radius:6px; font-size:13px; line-height:1.5;">
-                    <span style="opacity:0.7">策略建议：</span>
-                    <span id="ipa-warning-text">...</span>
-                </div>
+            <button class="btn" onclick="runIPA()">执行压力测试 (Run Stress Test)</button>
+            <div id="ipa-output" style="margin-top:15px; padding:15px; background:#F0F9FF; border-left:4px solid #0EA5E9; display:none;">
+                <div style="font-weight:bold; color:#0369A1;">计算完成</div>
+                <div style="font-size:13px; margin-top:5px;">购买力上限已锁定。请前往“资产录入”环节。</div>
             </div>
-        </section>
+        </div>
 
-        <!-- II. 房源录入 -->
-        <section id="section-1" class="movement-section">
-            <h2 class="section-title">II. 资产录入与尽职调查</h2>
+        <!-- 2. 资产录入 -->
+        <div id="view-asset" class="input-section">
+            <div class="section-title">🏠 资产尽职调查 (Due Diligence)</div>
             <div class="section-desc">
-                引入<strong>“事前验尸 (Pre-Mortem)”</strong>思维。除价格外，重点评估医疗可达性（黄金急救圈）、适老化设计（无障碍）及资产流动性（变现周期）。
-            </div>
-            
-            <div style="display:flex; gap:10px; margin-bottom:20px;">
-                <button class="btn btn-outline active" id="tab-0" onclick="switchProp(0)">资产 A</button>
-                <button class="btn btn-outline" id="tab-1" onclick="switchProp(1)">资产 B</button>
-                <button class="btn btn-outline" id="tab-2" onclick="switchProp(2)">资产 C</button>
+                引入《房产数据研究》中的<strong>“法拍净值还原”</strong>算法。请如实录入，AI 将自动清洗隐形税费与风险成本。
             </div>
 
-            <div class="map-container">
-                <div style="font-size:11px; text-align:center; color:#78909C; margin-bottom:5px;">选择区域以校准“资产流动性”系数</div>
-                <svg viewBox="0 0 400 200" class="sz-map-svg">
-                    <!-- 核心区域示意 -->
-                    <path d="M150,120 L190,120 L200,170 L150,180 Z" class="district-path" onclick="selectDistrict('福田', 90)" id="map-ft"></path>
-                    <text x="175" y="150" class="district-text">福田(医疗核心)</text>
-                    <path d="M80,120 L110,90 L150,120 L150,180 L60,190 Z" class="district-path" onclick="selectDistrict('南山', 85)" id="map-ns"></path>
-                    <text x="115" y="150" class="district-text">南山(高流动)</text>
-                    <path d="M190,110 L230,110 L230,160 L200,170 Z" class="district-path" onclick="selectDistrict('罗湖', 70)" id="map-lu"></path>
-                    <text x="215" y="140" class="district-text">罗湖(配套熟)</text>
-                    <!-- 其他区域 -->
-                    <path d="M100,40 L160,40 L160,90 L110,90 Z" class="district-path" onclick="selectDistrict('龙华', 75)"></path>
-                    <path d="M20,100 L80,120 L90,150 L60,190 L10,140 Z" class="district-path" onclick="selectDistrict('宝安', 70)"></path>
-                </svg>
+            <div class="btn-group">
+                <div class="btn-toggle active" onclick="toggleType('secondary')" id="btn-sec">存量二手房</div>
+                <div class="btn-toggle" onclick="toggleType('auction')" id="btn-auc">法拍/不良资产</div>
             </div>
 
-            <div id="prop-form-container"></div>
-            <button class="btn btn-primary" onclick="analyzeProp()">执行多维风险扫描</button>
-            <div id="prop-analysis-result"></div>
-        </section>
-
-        <!-- III. 综合对比 -->
-        <section id="section-2" class="movement-section">
-            <h2 class="section-title">III. 决策矩阵 (MCDA)</h2>
-            <div class="section-desc">多目标决策分析：在流动性、居住舒适度与医疗安全之间寻找最优解。</div>
-            <div id="comparison-chart"></div>
-            <div style="margin-top:20px; font-size:12px; color:#90A4AE; padding:10px; background:#F5F7FA; border-radius:6px;">
-                注：评级逻辑参考白皮书“物理象限”与“医疗象限”标准。流动性评分基于区域历史成交周期 (DOM) 估算。
+            <div class="form-group">
+                <label>所在区域 (District)</label>
+                <select id="prop_district" onchange="updateDistrictStats()">
+                    <option value="" disabled selected>-- 请选择行政区 --</option>
+                    <option value="futian">福田区 (Futian) - 医疗核心/高流动性</option>
+                    <option value="nanshan">南山区 (Nanshan) - 科技/高价值</option>
+                    <option value="luohu">罗湖区 (Luohu) - 老城/医疗丰富</option>
+                    <option value="baoan">宝安区 (Baoan) - 新中心/库存大</option>
+                    <option value="longhua">龙华区 (Longhua) - 人口密集/拥堵</option>
+                    <option value="longgang">龙岗区 (Longgang) - 刚需/远郊</option>
+                    <option value="yantian">盐田区 (Yantian) - 宜居/低流动</option>
+                    <option value="guangming">光明区 (Guangming) - 科学城/远</option>
+                    <option value="pingshan">坪山区 (Pingshan) - 产业/远</option>
+                    <option value="dapeng">大鹏新区 (Dapeng) - 旅游/低流动</option>
+                </select>
+                <div id="district-hint" style="font-size:11px; color:#64748B; margin-top:4px;"></div>
             </div>
-        </section>
 
-        <!-- IV. 报告 -->
-        <section id="section-3" class="movement-section">
-            <h2 class="section-title">Fin. 投资备忘录 (Investment Memo)</h2>
-            <div class="mba-report-container">
-                <div class="mba-header">
-                    <div style="font-size:22px; font-weight:bold; color:#2C3E50;">ASSET ACQUISITION MEMO</div>
-                    <div style="font-size:11px; margin-top:5px; color:#78909C; letter-spacing:1px;">Based on Senior Liquidity Profile & Fiduciary Standards</div>
+            <div class="form-group">
+                <label>资产名称 (Asset Name)</label>
+                <input type="text" id="prop_name" placeholder="例如：香蜜湖某小区">
+            </div>
+
+            <!-- 法拍特有 -->
+            <div id="auction-panel" style="display:none; background:#FEF2F2; padding:15px; border-radius:6px; margin-bottom:15px; border:1px dashed #EF4444;">
+                <label style="color:#B91C1C;">⚠️ 法拍风控核心字段</label>
+                <div class="form-group">
+                    <label>产权属性 (Ownership)</label>
+                    <select id="prop_owner">
+                        <option value="personal">个人产权 (Personal)</option>
+                        <option value="company">公司产权 (Company) - 含土增税风险</option>
+                    </select>
                 </div>
-                <div id="final-report-content">数据待录入...</div>
-            </div>
-            
-            <a href="https://docs.google.com/document/d/1olHeSYCQQb6jZfBWHJdd3WRoY3vo1V9rVyxnznXfmaA/edit?usp=drivesdk" target="_blank" class="white-paper-link">
-                📄 点击查阅：《深圳购房AI决策系统白皮书》<br>
-                <span style="font-size:11px; opacity:0.8">含：55岁用户画像解析、信托责任算法定义、风险热力图</span>
-            </a>
-            
-            <button class="btn btn-primary" style="margin-top:15px;" onclick="copyReport()">复制报告文本</button>
-        </section>
-        
-        <div style="height:30px;"></div>
-    </main>
-
-    <nav class="mobile-bottom-nav">
-        <div class="nav-tab active" onclick="navTo(0)"><div class="nav-tab-icon">I</div>能力</div>
-        <div class="nav-tab" onclick="navTo(1)"><div class="nav-tab-icon">II</div>资产</div>
-        <div class="nav-tab" onclick="navTo(2)"><div class="nav-tab-icon">III</div>对比</div>
-        <div class="nav-tab" onclick="navTo(3)"><div class="nav-tab-icon">Fin</div>报告</div>
-    </nav>
-
-</div>
-
-<script>
-// --- 核心状态 ---
-const store = {
-    ipa: { maxPrice: 0, loanTerm: 0, monthlyPay: 0, calculated: false },
-    properties: [
-        { id:0, name:'', price:0, hospitalTime:15, hasElevator:'yes', noise:'quiet', age:10, heat:50 },
-        { id:1, name:'', price:0, hospitalTime:15, hasElevator:'yes', noise:'quiet', age:10, heat:50 },
-        { id:2, name:'', price:0, hospitalTime:15, hasElevator:'yes', noise:'quiet', age:10, heat:50 }
-    ],
-    currIdx: 0
-};
-
-function navTo(index) {
-    document.querySelectorAll('.movement-section').forEach(el => el.style.display = 'none');
-    document.getElementById('section-' + index).style.display = 'block';
-    
-    document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.nav-tab')[index].classList.add('active');
-    
-    window.scrollTo(0,0);
-    
-    if(index === 2) renderComparison();
-    if(index === 3) generateReport();
-}
-
-// --- I. IPA 算法 (适老风控版) ---
-function runIPACalculation() {
-    const cash = parseFloat(document.getElementById('ipa_cash').value);
-    const income = parseFloat(document.getElementById('ipa_income').value);
-    const age = parseFloat(document.getElementById('ipa_age').value);
-
-    if(!cash) { alert("请输入核心资本(现金)"); return; }
-
-    // 1. 贷款年限计算 (严控)
-    // 依据白皮书3.1.1章节：女性借款人年龄限制，通常 Max Age 70
-    let maxTenure = Math.max(0, 70 - age);
-    
-    // 2. 偿债能力 (TDSR)
-    // 针对临退休人群，风控模型建议月供不超过收入的 45%
-    let maxMonthly = income * 0.45; 
-    let maxLoan = 0;
-    
-    if(maxTenure > 0 && maxMonthly > 0) {
-        let r = 3.2 / 100 / 12; // 假设利率
-        let n = maxTenure * 12;
-        maxLoan = (maxMonthly * (1 - Math.pow(1+r, -n))) / r;
-        maxLoan = maxLoan / 10000; 
-    }
-
-    // 3. 购买力上限 (短板原理)
-    let capLiquidity = cash + maxLoan; // 资金能力
-    let capRegulatory = cash / 0.3; // 首付能力 (LTV 70% Max)
-    
-    let finalMax = Math.min(capLiquidity, capRegulatory);
-    let actualLoan = Math.max(0, finalMax - cash);
-
-    store.ipa = {
-        maxPrice: finalMax,
-        cashPart: cash,
-        loanPart: actualLoan,
-        loanTerm: maxTenure,
-        calculated: true
-    };
-
-    // UI 渲染
-    document.getElementById('ipa-result-card').style.display = 'block';
-    document.getElementById('ipa-max-price').innerText = finalMax.toFixed(0);
-    document.getElementById('val-cash').innerText = cash.toFixed(0);
-    document.getElementById('val-loan').innerText = actualLoan.toFixed(0);
-
-    let warnText = "";
-    if(maxTenure <= 5) {
-        warnText = `贷款窗口期极短 (${maxTenure}年)，杠杆效应微弱。建议采用全款或高首付策略，避免现金流断裂。`;
-    } else if (actualLoan > 0) {
-        warnText = `理论可贷 ${maxTenure} 年。基于适老风控原则，请务必保留 6-12 个月的月供储备金，勿满仓操作。`;
-    } else {
-        warnText = "基于当前年龄/收入模型，全款购房为最优解，无负债风险。";
-    }
-    document.getElementById('ipa-warning-text').innerText = warnText;
-}
-
-// --- II. 房源录入 (专业维度) ---
-function switchProp(idx) {
-    store.currIdx = idx;
-    renderPropForm();
-    [0,1,2].forEach(i => {
-        const btn = document.getElementById('tab-'+i);
-        if(i===idx) btn.classList.add('active'); else btn.classList.remove('active');
-    });
-}
-
-function selectDistrict(name, heat) {
-    store.properties[store.currIdx].name = name;
-    store.properties[store.currIdx].heat = heat; 
-    renderPropForm();
-}
-
-function renderPropForm() {
-    const p = store.properties[store.currIdx];
-    document.getElementById('prop-form-container').innerHTML = `
-        <div class="form-group">
-            <label>资产名称/区域</label>
-            <input type="text" value="${p.name}" onchange="updateP('name', this.value)" placeholder="点击地图选择">
-        </div>
-        <div class="form-group">
-            <label>挂牌价格 (万)</label>
-            <input type="number" value="${p.price||''}" onchange="updateP('price', this.value)">
-        </div>
-        
-        <div style="background:#F5F7FA; padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid #ECEFF1;">
-            <label style="color:#2C3E50; font-size:12px;">适老化核心指标 (Aging-Friendly Metrics)</label>
-            <div style="display:flex; gap:10px; margin-bottom:10px;">
-                <div style="flex:1">
-                    <label style="font-size:11px;">黄金急救圈 (分)</label>
-                    <input type="number" value="${p.hospitalTime}" onchange="updateP('hospitalTime', this.value)" placeholder="到三甲时间">
+                <div class="form-group">
+                    <label>起拍价 (Starting Bid) [万]</label>
+                    <input type="number" id="prop_bid">
                 </div>
-                <div style="flex:1">
-                    <label style="font-size:11px;">垂直通行 (电梯)</label>
-                    <select onchange="updateP('hasElevator', this.value)">
-                        <option value="yes" ${p.hasElevator=='yes'?'selected':''}>具备 (Yes)</option>
-                        <option value="no" ${p.hasElevator=='no'?'selected':''}>缺失 (No)</option>
+            </div>
+
+            <!-- 二手特有 -->
+            <div id="secondary-panel">
+                <div class="form-group">
+                    <label>挂牌总价 (Ask Price) [万]</label>
+                    <input type="number" id="prop_price">
+                </div>
+            </div>
+
+            <!-- 通用指标 -->
+            <div style="display:flex; gap:10px;">
+                <div class="form-group" style="flex:1">
+                    <label>到三甲医院 (分)</label>
+                    <input type="number" id="prop_med" placeholder="急救时间">
+                </div>
+                <div class="form-group" style="flex:1">
+                    <label>是否有电梯</label>
+                    <select id="prop_lift">
+                        <option value="yes">有 (Yes)</option>
+                        <option value="no">无 (No)</option>
                     </select>
                 </div>
             </div>
-            <div>
-                <label style="font-size:11px;">声环境质量</label>
-                <select onchange="updateP('noise', this.value)">
-                    <option value="quiet" ${p.noise=='quiet'?'selected':''}>I类标准 (安静)</option>
-                    <option value="noisy" ${p.noise=='noisy'?'selected':''}>超标 (临街/噪音)</option>
-                </select>
+
+            <button class="btn" onclick="addAsset()">纳入分析池 (Add to Analysis)</button>
+            <div id="asset-list-display" style="margin-top:15px; font-size:13px; color:#666;">
+                当前分析池：0 套资产
             </div>
         </div>
 
-        <div class="form-group">
-            <label>流动性指标 (Liquidity Metrics)</label>
-            <div style="display:flex; gap:10px;">
-                <div style="flex:1">
-                    <label style="font-size:11px;">资产楼龄 (年)</label>
-                    <input type="number" value="${p.age}" onchange="updateP('age', this.value)">
+        <!-- 3. MBA 报告 -->
+        <div id="view-report" class="input-section" style="padding:0; border:none; background:transparent; box-shadow:none;">
+            <div class="mba-report" id="final-report">
+                <div class="watermark">CONFIDENTIAL</div>
+                
+                <div class="rep-header">
+                    <div class="rep-title">Strategic Investment Memo</div>
+                    <div class="rep-meta">
+                        Project: Shenzhen Asset Acquisition (Senior Profile)<br>
+                        Date: <span id="rep-date">---</span> | Version: 2.0 (Fiduciary Standard)
+                    </div>
                 </div>
-                <div style="flex:1">
-                    <label style="font-size:11px;">区域换手热度</label>
-                    <input type="number" value="${p.heat}" onchange="updateP('heat', this.value)">
+
+                <!-- 1. 宏观背景 -->
+                <div class="rep-section">
+                    <div class="rep-h2">I. Market Context (宏观背景)</div>
+                    <div class="rep-p">
+                        根据《深圳房产数据研究报告》，当前市场已进入存量分化周期。核心风险特征如下：
+                    </div>
+                    <div class="reference-box">
+                        • <strong>流动性紧缩：</strong>二手房平均成交周期已拉长至 <strong style="color:#B45309">204天</strong>。非核心资产变现极难。<br>
+                        • <strong>柠檬市场效应：</strong>买卖双方信息不对称加剧，尤其是法拍房领域的隐性债务风险。<br>
+                        • <strong>政策变量：</strong>2025年新税制下，公司产权房产交易的土地增值税（LVAT）预征率调整，直接影响持有成本。
+                    </div>
+                </div>
+
+                <!-- 2. 财务能力 -->
+                <div class="rep-section">
+                    <div class="rep-h2">II. Financial Capacity (财务压力测试)</div>
+                    <div class="rep-p">
+                        基于 IPA (In-Principle Approval) 模型的测算结果：
+                    </div>
+                    <table class="rep-table">
+                        <tr>
+                            <th>Metric (指标)</th>
+                            <th>Value (数值)</th>
+                            <th>Stress Test (压力测试)</th>
+                        </tr>
+                        <tr>
+                            <td>Cash Equity (现金权益)</td>
+                            <td id="rep-cash">---</td>
+                            <td>流动性充足</td>
+                        </tr>
+                        <tr>
+                            <td>Max Leverage (最大杠杆)</td>
+                            <td id="rep-loan">---</td>
+                            <td>受限于年龄 (Tenure Cap)</td>
+                        </tr>
+                        <tr>
+                            <td style="background:#F3F4F6"><strong>Safe Purchase Cap (购买力上限)</strong></td>
+                            <td style="background:#F3F4F6; font-weight:bold; color:#1E3A8A;" id="rep-cap">---</td>
+                            <td style="background:#F3F4F6">安全边界</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- 3. 资产矩阵 -->
+                <div class="rep-section">
+                    <div class="rep-h2">III. Asset Matrix (资产事前验尸)</div>
+                    <div class="rep-p">
+                        引入“事前验尸 (Pre-Mortem)”思维：假设投资失败，原因何在？
+                        <br>本表基于<strong>“净值还原法”</strong>，已扣除法拍房的潜在税费与腾退成本。
+                    </div>
+                    <table class="rep-table">
+                        <thead>
+                            <tr>
+                                <th>Asset Name</th>
+                                <th>District</th>
+                                <th>Net Cost</th>
+                                <th>Risk Rating</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rep-asset-body">
+                            <tr><td colspan="4" style="text-align:center; padding:20px; color:#999;">暂无资产数据，请在“资产录入”页添加</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 4. 信托建议 -->
+                <div class="rep-section">
+                    <div class="rep-h2">IV. Fiduciary Advisory (信托建议)</div>
+                    <div class="rep-p">
+                        基于白皮书“全生命周期资产 (Lifecycle Asset)”标准，针对资深买家提出以下风控建议：
+                    </div>
+                    <ul style="font-size:14px; line-height:1.8; padding-left:20px;">
+                        <li>
+                            <strong>流动性陷阱 (Liquidity Trap)：</strong> 坚决规避楼龄>20年且无电梯的物业。此类资产在未来5年的换手率预计将下降 40%。
+                        </li>
+                        <li>
+                            <strong>法拍排雷 (Foreclosure Risk)：</strong> 若涉及公司产权（Company Title），务必预留成交价 <strong>30%-60%</strong> 的资金用于缴纳土地增值税 (LVAT)。
+                        </li>
+                        <li>
+                            <strong>黄金4分钟 (Golden 4 Mins)：</strong> 医疗资源不仅是配套，更是生命线。优选福田/南山核心区三甲医院覆盖范围。
+                        </li>
+                    </ul>
+                </div>
+
+                <div style="text-align:center; font-size:10px; color:#999; margin-top:40px; border-top:1px solid #eee; padding-top:10px;">
+                    Generated by Shenzhen Home Decision System | AI Powered Fiduciary Service
                 </div>
             </div>
-        </div>
-    `;
-}
-
-function updateP(field, val) {
-    store.properties[store.currIdx][field] = field === 'name' || field.startsWith('has') || field === 'noise' ? val : parseFloat(val);
-}
-
-function analyzeProp() {
-    const p = store.properties[store.currIdx];
-    if(!store.ipa.calculated) { alert("请先计算 IPA"); return; }
-    
-    const isSafePrice = p.price <= store.ipa.maxPrice;
-    
-    // 适老评分算法
-    let agingScore = 100;
-    if(p.hasElevator === 'no') agingScore -= 50; // 一票否决
-    if(p.hospitalTime > 30) agingScore -= 20;
-    if(p.noise === 'noisy') agingScore -= 15;
-    
-    // 流动性评分
-    let liquidScore = p.heat - p.age; 
-    
-    let html = `
-        <div style="margin-top:15px; padding:15px; border-radius:8px; background:#FFF; border:1px solid #CFD8DC; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
-            <div style="margin-bottom:10px; font-weight:bold; font-size:14px; color:${isSafePrice?'#2E7D32':'#C62828'}">
-                IPA 校验: ${isSafePrice ? '✅ 资本充足 (Funded)' : '❌ 资本不足 (Deficit)'}
-            </div>
-            <div style="display:flex; gap:10px;">
-                <div style="flex:1; padding:8px; background:${agingScore<60?'#FFEBEE':'#E8F5E9'}; border-radius:4px;">
-                    <div style="font-size:11px; opacity:0.8">适老度评分</div>
-                    <div style="font-weight:bold; font-size:16px;">${agingScore}</div>
-                    <div style="font-size:10px;">${p.hasElevator=='no'?'缺乏电梯':(p.hospitalTime<20?'医疗便捷':'')}</div>
-                </div>
-                <div style="flex:1; padding:8px; background:${liquidScore<30?'#FFF8E1':'#E3F2FD'}; border-radius:4px;">
-                    <div style="font-size:11px; opacity:0.8">流动性评分</div>
-                    <div style="font-weight:bold; font-size:16px;">${liquidScore>50?'High':'Avg'}</div>
-                    <div style="font-size:10px;">${p.age>20?'折旧风险大':(p.heat>70?'易变现':'')}</div>
-                </div>
-            </div>
-        </div>
-    `;
-    document.getElementById('prop-analysis-result').innerHTML = html;
-}
-
-// --- III. 对比 ---
-function renderComparison() {
-    let html = '';
-    store.properties.forEach(p => {
-        if(p.price > 0) {
-            let sAging = 100 - (p.hasElevator=='no'?50:0) - (p.hospitalTime>30?20:0) - (p.noise=='noisy'?15:0);
-            let sLiquid = Math.min(100, p.heat - p.age + 30);
             
-            html += `
-                <div style="margin-bottom:15px; background:#fff; padding:15px; border-radius:8px; border:1px solid #CFD8DC;">
-                    <div style="font-weight:bold; margin-bottom:8px; font-size:14px;">${p.name || '未命名资产'}</div>
-                    
-                    <div style="display:flex; align-items:center; margin-bottom:6px;">
-                        <span style="width:70px; font-size:11px; color:#546E7A;">适老性</span>
-                        <div style="flex:1; height:6px; background:#ECEFF1; border-radius:3px; margin:0 10px;">
-                            <div style="width:${Math.max(0,sAging)}%; height:100%; background:#2E7D32; border-radius:3px;"></div>
-                        </div>
-                        <span style="font-size:11px; font-weight:bold; width:25px; text-align:right;">${sAging}</span>
-                    </div>
+            <button class="btn" style="margin-top:20px; background:#4B5563;" onclick="window.print()">🖨️ 打印 / 导出 PDF</button>
+        </div>
 
-                    <div style="display:flex; align-items:center;">
-                        <span style="width:70px; font-size:11px; color:#546E7A;">变现力</span>
-                        <div style="flex:1; height:6px; background:#ECEFF1; border-radius:3px; margin:0 10px;">
-                            <div style="width:${Math.max(0,sLiquid)}%; height:100%; background:#0288D1; border-radius:3px;"></div>
-                        </div>
-                        <span style="font-size:11px; font-weight:bold; width:25px; text-align:right;">${sLiquid}</span>
-                    </div>
-                </div>
-            `;
-        }
-    });
-    document.getElementById('comparison-chart').innerHTML = html || "暂无有效资产数据";
+    </div>
+
+    <!-- 底部导航 -->
+    <nav class="bottom-nav">
+        <div class="nav-btn active" onclick="switchTab('view-ipa', this)">
+            <div class="nav-icon">📊</div>
+            <div>IPA</div>
+        </div>
+        <div class="nav-btn" onclick="switchTab('view-asset', this)">
+            <div class="nav-icon">🏠</div>
+            <div>资产</div>
+        </div>
+        <div class="nav-btn" onclick="switchTab('view-report', this)">
+            <div class="nav-icon">📑</div>
+            <div>报告</div>
+        </div>
+    </nav>
+</div>
+
+<script>
+// --- 全局数据 ---
+const state = {
+    ipa: { cap: 0, cash: 0, loan: 0, calculated: false },
+    assets: [],
+    mode: 'secondary' // secondary | auction
+};
+
+// 区域数据字典 (参考白皮书评级)
+const DISTRICT_DATA = {
+    futian: { name: '福田区', medScore: 5, liqScore: 5, hint: 'S级：医疗最密集，流动性极高' },
+    nanshan: { name: '南山区', medScore: 4, liqScore: 5, hint: 'A级：科技核心区，资产价值高' },
+    luohu: { name: '罗湖区', medScore: 5, liqScore: 2, hint: 'C级：医疗好但楼龄老，流动性一般' },
+    baoan: { name: '宝安区', medScore: 3, liqScore: 4, hint: 'B级：新中心，但医疗资源需甄别' },
+    longhua: { name: '龙华区', medScore: 3, liqScore: 3, hint: 'C级：拥堵风险高，适合刚需' },
+    longgang: { name: '龙岗区', medScore: 2, liqScore: 2, hint: 'D级：远郊，流动性较弱' },
+    yantian: { name: '盐田区', medScore: 2, liqScore: 1, hint: 'D级：宜居但资产变现难' },
+    guangming: { name: '光明区', medScore: 2, liqScore: 2, hint: 'D级：发展中，距离远' },
+    pingshan: { name: '坪山区', medScore: 1, liqScore: 1, hint: 'E级：产业为主，非自住慎选' },
+    dapeng: { name: '大鹏新区', medScore: 1, liqScore: 1, hint: 'E级：旅游地产，极难变现' }
+};
+
+// --- 导航逻辑 ---
+function switchTab(viewId, btnEl) {
+    // 切换视图
+    document.querySelectorAll('.input-section').forEach(el => el.classList.remove('active'));
+    document.getElementById(viewId).classList.add('active');
+    
+    // 切换按钮状态
+    document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+    if(btnEl) btnEl.classList.add('active');
+    
+    // 滚动到顶部
+    window.scrollTo(0,0);
+    
+    // 如果进入报告页，刷新数据
+    if(viewId === 'view-report') updateReport();
 }
 
-// --- IV. 报告 ---
-function generateReport() {
-    if(!store.ipa.calculated) {
-        document.getElementById('final-report-content').innerHTML = "需先完成 IPA 评估。";
-        return;
-    }
+function toggleType(type) {
+    state.mode = type;
+    document.getElementById('btn-sec').classList.toggle('active', type === 'secondary');
+    document.getElementById('btn-auc').classList.toggle('active', type === 'auction');
     
-    // 生成列表
-    let rows = store.properties.filter(p=>p.price>0).map(p => {
-        let tags = "";
-        if(p.hasElevator=='no') tags += `<span class="tag tag-warn">缺电梯</span>`;
-        if(p.hospitalTime<=15) tags += `<span class="tag tag-med">医疗圈</span>`;
-        if(p.age>20) tags += `<span class="tag tag-warn">高龄</span>`;
-        if(!tags) tags = `<span class="tag" style="background:#EEE; color:#999">标准</span>`;
+    document.getElementById('secondary-panel').style.display = type === 'secondary' ? 'block' : 'none';
+    document.getElementById('auction-panel').style.display = type === 'auction' ? 'block' : 'none';
+}
+
+function updateDistrictStats() {
+    const distKey = document.getElementById('prop_district').value;
+    const hintEl = document.getElementById('district-hint');
+    const medInput = document.getElementById('prop_med');
+    
+    if (DISTRICT_DATA[distKey]) {
+        hintEl.innerText = DISTRICT_DATA[distKey].hint;
+        // 自动填入医疗参考值 (5分=5分钟，1分=25分钟，简化模拟)
+        const medTime = (6 - DISTRICT_DATA[distKey].medScore) * 5; 
+        if(!medInput.value) medInput.value = medTime;
+    }
+}
+
+// --- 1. IPA 算法 ---
+function runIPA() {
+    const cash = parseFloat(document.getElementById('ipa_cash').value) || 0;
+    const income = parseFloat(document.getElementById('ipa_income').value) || 0;
+    const age = parseInt(document.getElementById('ipa_age').value) || 55;
+
+    // 白皮书风控逻辑
+    const maxAge = 70; // 贷款年龄上限
+    const tenure = Math.max(0, maxAge - age);
+    
+    // 偿债比率 (TDSR) 45% (资深买家保守值)
+    let maxLoan = 0;
+    if (tenure > 0) {
+        // 简化 PV 公式 (Rate 3.2%)
+        const r = 0.032 / 12;
+        const n = tenure * 12;
+        const maxMonthly = income * 0.45;
+        maxLoan = (maxMonthly * (1 - Math.pow(1 + r, -n))) / r;
+        maxLoan = maxLoan / 10000; // 万
+    }
+
+    // 购买力上限 = Min(现金+贷款, 现金/首付比例)
+    // 假设首付 30% (LTV 70%)
+    const cap1 = cash + maxLoan;
+    const cap2 = cash / 0.3;
+    const finalCap = Math.min(cap1, cap2);
+
+    state.ipa = {
+        cap: finalCap,
+        cash: cash,
+        loan: finalCap - cash,
+        calculated: true
+    };
+
+    document.getElementById('ipa-output').style.display = 'block';
+    // 自动更新报告页数据
+    document.getElementById('rep-cash').innerText = cash.toFixed(0) + " 万";
+    document.getElementById('rep-loan').innerText = (finalCap - cash).toFixed(0) + " 万";
+    document.getElementById('rep-cap').innerText = finalCap.toFixed(0) + " 万";
+}
+
+// --- 2. 资产录入与清洗 ---
+function addAsset() {
+    if (!state.ipa.calculated) { alert("请先执行 IPA 压力测试！"); switchTab('view-ipa'); return; }
+
+    const name = document.getElementById('prop_name').value || "未命名资产";
+    const districtKey = document.getElementById('prop_district').value;
+    const medTime = parseFloat(document.getElementById('prop_med').value) || 0;
+    const lift = document.getElementById('prop_lift').value;
+    
+    if (!districtKey) { alert("请选择行政区"); return; }
+
+    let netCost = 0;
+    let riskTags = [];
+    let riskLevel = "SAFE"; // SAFE, MED, HIGH
+
+    // 区域与流动性评估
+    const distData = DISTRICT_DATA[districtKey];
+    if (distData.liqScore <= 2) {
+        riskTags.push("流动性差");
+        if (riskLevel !== "HIGH") riskLevel = "MED";
+    }
+
+    if (state.mode === 'auction') {
+        // 法拍逻辑
+        const bid = parseFloat(document.getElementById('prop_bid').value) || 0;
+        const owner = document.getElementById('prop_owner').value;
+        
+        let taxRate = 0.05; // 基础税费
+        if (owner === 'company') {
+            taxRate += 0.30; // 土地增值税预估 (白皮书模型)
+            riskTags.push("LVAT税费雷");
+            riskLevel = "HIGH";
+        }
+        netCost = bid * (1 + taxRate);
+        riskTags.push("法拍资产");
+    } else {
+        // 二手房
+        netCost = parseFloat(document.getElementById('prop_price').value) || 0;
+    }
+
+    // 适老风控 (Pre-Mortem)
+    if (lift === 'no') {
+        riskTags.push("无电梯(致命伤)");
+        riskLevel = "HIGH"; // 55岁+ 无电梯一票否决
+    }
+    if (medTime > 15) {
+        riskTags.push("急救圈外");
+        if (riskLevel !== "HIGH") riskLevel = "MED";
+    }
+    if (netCost > state.ipa.cap) {
+        riskTags.push("资金超限");
+        riskLevel = "HIGH";
+    }
+
+    state.assets.push({
+        name, netCost, medTime, riskLevel, riskTags, districtName: distData.name
+    });
+
+    document.getElementById('asset-list-display').innerText = `当前分析池：${state.assets.length} 套资产`;
+    alert("资产已录入并完成风险清洗。");
+}
+
+// --- 3. 生成报告 ---
+function updateReport() {
+    document.getElementById('rep-date').innerText = new Date().toLocaleDateString();
+    
+    const tbody = document.getElementById('rep-asset-body');
+    if (state.assets.length === 0) return;
+
+    tbody.innerHTML = state.assets.map(a => {
+        const badgeClass = a.riskLevel === 'HIGH' ? 'high' : 'safe';
         return `
             <tr>
-                <td>${p.name}</td>
-                <td>${p.price}万</td>
-                <td>${tags}</td>
+                <td>
+                    <strong>${a.name}</strong><br>
+                    <span style="font-size:10px; color:#666">${a.riskTags.join(', ')}</span>
+                </td>
+                <td>${a.districtName}</td>
+                <td>${a.netCost.toFixed(0)} 万</td>
+                <td><span class="risk-tag ${badgeClass}">${a.riskLevel}</span></td>
             </tr>
         `;
     }).join('');
-
-    let html = `
-        <div class="mba-section-title" style="margin-top:0;">1. Financial Capability (财务能力)</div>
-        <p>
-            基于您的 IPA 压力测试，安全购买力上限为 <strong>${store.ipa.maxPrice.toFixed(0)}万</strong>。
-            依据白皮书 3.1 章节建议，对于资深购房者，建议预留 <strong>${(store.ipa.maxPrice*0.1).toFixed(0)}万</strong> 现金作为医疗与养老备用金 (Emergency Fund)，避免资产固化风险。
-        </p>
-
-        <div class="mba-section-title">2. Asset Liquidity (流动性评估)</div>
-        <p>
-            在存量分化市场中，资产的“变现能力”优于“增值潜力”。
-            <strong>推荐配置：</strong> 福田/南山核心区、带电梯、楼龄&lt;15年的物业，确保在需要资金时能在 90 天内成交。
-        </p>
-
-        <div class="mba-section-title">3. Candidate Matrix (候选矩阵)</div>
-        <table class="mba-table">
-            <thead><tr><th>资产名称</th><th>总价</th><th>核心特征</th></tr></thead>
-            <tbody>${rows || '<tr><td colspan="3">无数据</td></tr>'}</tbody>
-        </table>
-
-        <div style="background:#ECEFF1; padding:15px; border-radius:6px; margin-top:20px;">
-            <strong>顾问建议 (Advisory)：</strong>
-            <ul style="margin:5px 0 0 0; padding-left:20px; font-size:13px; color:#37474F;">
-                <li><strong>否决项：</strong>坚决避开无电梯、高坡度社区，此类资产不符合适老标准且流动性枯竭。</li>
-                <li><strong>加分项：</strong>优先考虑“三甲医院 15分钟生活圈”内的物业。</li>
-                <li><strong>资金策略：</strong>若贷款年限小于 5 年，优先考虑全款购买小户型，以降低月供焦虑。</li>
-            </ul>
-        </div>
-    `;
-    document.getElementById('final-report-content').innerHTML = html;
 }
 
-function copyReport() {
-    const t = document.getElementById('final-report-content').innerText;
-    navigator.clipboard.writeText(t).then(() => alert("已复制"));
-}
+// 初始化
+document.addEventListener('DOMContentLoaded', () => {
+    // 默认高亮第一个
+    switchTab('view-ipa', document.querySelector('.nav-btn'));
+});
 
 </script>
 </body>
