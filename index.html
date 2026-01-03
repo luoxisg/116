@@ -1,408 +1,816 @@
- <!DOCTYPE html>
+ 
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>深圳购房决策系统 - 资产安全专业版</title>
+    <title>资产协奏曲 | Symphony of Assets</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap');
+
         :root {
-            /* 专业配色：克制、理性、高可读性 */
-            --bg-paper: #F5F7FA;
-            --bg-card: #FFFFFF;
-            --text-primary: #2C3E50;
-            --text-secondary: #607D8B;
-            --accent-main: #34495E; /* 深蓝灰，体现专业 */
-            --accent-light: #ECEFF1;
-            --highlight: #FFF8E1;
-            --risk-color: #D32F2F;
-            --safe-color: #388E3C;
+            --piano-black: #1A1A1A;
+            --ivory-white: #F9F7F2;
+            --antique-gold: #C5A065;
+            --warm-grey: #8C8C8C;
+            --velvet-red: #B71C1C;
+            --forest-green: #2E7D32;
+            --navy-blue: #263238;
+            --alert-orange: #F57C00;
+
+            --font-heading: 'Noto Serif SC', 'Cormorant Garamond', serif;
+            --font-body: 'Lato', sans-serif;
             
-            --spacing-unit: 16px;
-            --border-radius: 8px; /* 更锐利的圆角 */
-            --bottom-nav-height: 60px;
-            
-            --anim-speed: 0.5s;
+            --anim-tempo: 0.6s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
-        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
         body {
-            background-color: var(--bg-paper); color: var(--text-primary);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            line-height: 1.6; margin: 0; padding: 0; font-size: 16px;
-            padding-bottom: calc(var(--bottom-nav-height) + 30px);
+            background-color: var(--ivory-white);
+            color: var(--piano-black);
+            font-family: var(--font-body);
+            margin: 0; padding: 0;
+            line-height: 1.6;
+            padding-bottom: 100px;
         }
 
-        /* 动效 */
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* 布局 */
-        .app-container { display: flex; min-height: 100vh; flex-direction: column; }
-        .mobile-header {
-            background: #fff; padding: 15px 20px; position: sticky; top: 0; z-index: 50;
-            border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;
-        }
-        .mobile-brand { font-size: 18px; font-weight: 700; color: var(--text-primary); letter-spacing: 0.5px; }
+        h1, h2, h3, h4 { font-family: var(--font-heading); margin: 0; font-weight: 600; }
         
-        .main-content { flex: 1; margin: 0 auto; padding: 20px; max-width: 900px; width: 100%; }
-        @media (min-width: 1025px) { .main-content { padding: 40px; } }
+        /* Animation Classes */
+        .fade-in-up { animation: fadeInUp var(--anim-tempo) forwards; opacity: 0; transform: translateY(20px); }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
 
-        /* 卡片 */
-        .movement-section {
-            background: var(--bg-card); padding: 30px; margin-bottom: 20px; border-radius: var(--border-radius);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.03); display: none;
-            animation: fadeIn 0.4s ease-out forwards; border: 1px solid #eee;
+        .slide-open { 
+            max-height: 0; opacity: 0; overflow: hidden; 
+            transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s ease;
         }
-        .movement-section.active-section { display: block; }
+        .slide-open.show { max-height: 800px; opacity: 1; }
 
-        .section-title { font-size: 22px; font-weight: 600; color: var(--text-primary); margin: 0 0 10px 0; display: flex; align-items: center; }
-        .section-desc { 
-            font-size: 14px; color: var(--text-secondary); margin-bottom: 25px; 
-            padding: 12px; background: var(--bg-paper); border-left: 3px solid var(--accent-main);
-        }
+        .pulse-badge { animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(197, 160, 101, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(197, 160, 101, 0); } 100% { box-shadow: 0 0 0 0 rgba(197, 160, 101, 0); } }
 
-        /* 表单 */
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; color: var(--text-secondary); font-size: 14px; font-weight: 500; }
-        input, select {
-            width: 100%; padding: 12px; border: 1px solid #CFD8DC; background: #fff;
-            border-radius: 6px; font-size: 16px; color: var(--text-primary); transition: 0.2s;
+        /* Header */
+        .header-maestro {
+            padding: 25px 24px;
+            background: var(--ivory-white);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 50;
+            backdrop-filter: blur(8px); background: rgba(249, 247, 242, 0.95);
         }
-        input:focus, select:focus { border-color: var(--accent-main); box-shadow: 0 0 0 2px rgba(52, 73, 94, 0.1); }
+        .brand-title { font-size: 24px; letter-spacing: 1px; color: var(--piano-black); font-family: var(--font-heading); }
+        .brand-subtitle { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--antique-gold); }
 
-        .btn {
-            padding: 14px; border-radius: 6px; font-size: 15px; width: 100%; margin-bottom: 10px;
-            border: none; cursor: pointer; font-weight: 600; transition: all 0.2s;
-        }
-        .btn-primary { background: var(--accent-main); color: #FFF; }
-        .btn-primary:hover { background: #2C3E50; box-shadow: 0 4px 12px rgba(44, 62, 80, 0.2); }
-        .btn-outline { border: 1px solid #CFD8DC; color: var(--text-secondary); background: transparent; }
-        .btn-outline.active { border-color: var(--accent-main); color: var(--accent-main); background: var(--accent-light); }
-        .btn-link { background: none; color: var(--accent-main); text-decoration: underline; padding: 0; width: auto; display: inline; font-weight: normal; }
-
-        /* IPA 结果 */
-        .ipa-card {
-            background: linear-gradient(145deg, #37474F 0%, #263238 100%);
-            color: #ECEFF1; padding: 25px; border-radius: 10px; margin-top: 20px; display: none;
-        }
-        .ipa-val-big { font-size: 40px; font-weight: 700; line-height: 1.1; margin: 10px 0; color: #FFF; }
+        /* Layout */
+        .movement-container { max-width: 800px; margin: 0 auto; padding: 20px; display: none; }
+        .movement-container.active { display: block; }
         
-        /* 地图 */
-        .map-container { background: #ECEFF1; border-radius: 8px; padding: 10px; margin-bottom: 20px; border: 1px solid #CFD8DC; }
-        .sz-map-svg { width: 100%; height: auto; display: block; filter: grayscale(20%); } /* 降低饱和度更显专业 */
-        .district-path { fill: #FFF; stroke: #546E7A; stroke-width: 1; cursor: pointer; transition: 0.2s; }
-        .district-path:hover, .district-path.active { fill: var(--text-secondary); stroke: #FFF; }
-        .district-text { pointer-events: none; font-size: 10px; fill: #37474F; font-weight: bold; }
-        .district-path.active + .district-text { fill: #FFF; }
+        .movement-title { font-size: 20px; border-bottom: 2px solid var(--antique-gold); display: inline-block; padding-bottom: 5px; margin-bottom: 5px; }
+        .movement-desc { font-size: 11px; color: var(--warm-grey); font-style: italic; margin-bottom: 25px; }
 
-        /* 底部导航 */
-        .mobile-bottom-nav {
-            position: fixed; bottom: 0; left: 0; width: 100%; height: var(--bottom-nav-height);
-            background: #FFF; border-top: 1px solid #EEE; display: flex; z-index: 100;
+        /* Inputs */
+        .input-group { margin-bottom: 18px; position: relative; }
+        .input-label { display: block; font-size: 10px; color: var(--warm-grey); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; font-weight: 700; }
+        .music-input {
+            width: 100%; border: none; border-bottom: 1px solid #CCC; background: transparent;
+            font-family: var(--font-heading); font-size: 16px; color: var(--piano-black);
+            padding: 8px 0; transition: 0.3s; border-radius: 0;
         }
-        .nav-tab {
-            flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            font-size: 11px; color: #90A4AE; cursor: pointer;
-        }
-        .nav-tab.active { color: var(--accent-main); font-weight: 600; }
-        .nav-tab-icon { font-size: 18px; margin-bottom: 3px; font-family: serif; }
+        .music-input:focus { border-bottom-color: var(--antique-gold); outline: none; }
+        .music-input::placeholder { color: #DDD; }
 
-        /* MBA 报告 */
-        .mba-report-container { 
-            border: 1px solid #CFD8DC; background: #fff; padding: 30px; 
-            font-family: 'Times New Roman', "Songti SC", serif; 
+        /* Buttons */
+        .btn-baton {
+            width: 100%; padding: 14px; margin-top: 15px;
+            background: var(--piano-black); color: var(--ivory-white);
+            border: 1px solid var(--piano-black);
+            font-family: var(--font-body); text-transform: uppercase; letter-spacing: 1.5px; font-size: 11px; font-weight: bold;
+            cursor: pointer; transition: 0.2s; border-radius: 2px;
+            display: flex; justify-content: center; align-items: center; gap: 8px;
         }
-        .mba-header { text-align: center; border-bottom: 2px solid #2C3E50; padding-bottom: 20px; margin-bottom: 25px; }
-        .mba-title { font-size: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #2C3E50; }
+        .btn-baton:active { transform: scale(0.98); background: #333; }
+        .btn-baton.secondary { background: transparent; color: var(--piano-black); border-color: #CCC; }
+
+        .btn-tab {
+            flex: 1; border: 1px solid #EEE; background: #FFF; padding: 12px;
+            font-family: var(--font-heading); font-size: 14px; color: var(--warm-grey);
+            cursor: pointer; transition: 0.3s; text-align: center;
+        }
+        .btn-tab:first-child { border-radius: 4px 0 0 4px; border-right: none; }
+        .btn-tab:last-child { border-radius: 0 4px 4px 0; border-left: none; }
+        .btn-tab.active { background: var(--piano-black); color: var(--antique-gold); border-color: var(--piano-black); }
+
+        /* Map */
+        .map-container { background: #ECEFF1; border-radius: 4px; padding: 10px; margin-bottom: 20px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
+        .map-svg { width: 100%; height: auto; filter: grayscale(100%); transition: 0.5s; }
+        .map-svg.active-map { filter: grayscale(0%); }
+        .map-area { fill: #CFD8DC; stroke: #FFF; stroke-width: 2; transition: 0.3s; cursor: pointer; }
+        .map-area.selected { fill: var(--antique-gold); filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
+        .map-label { font-size: 10px; fill: #666; pointer-events: none; font-weight: bold; }
+        .map-area.selected + .map-label { fill: #FFF; }
+
+        /* Score & Cards */
+        .score-card {
+            background: #FFF; border: 1px solid #EEE; padding: 20px; margin-top: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-left: 4px solid var(--antique-gold);
+            border-radius: 4px;
+        }
         
-        .mba-section-title {
-            font-size: 14px; font-weight: bold; color: #2C3E50; text-transform: uppercase;
-            border-left: 3px solid #2C3E50; padding-left: 10px; margin: 25px 0 15px 0; background: #F5F7FA; padding: 8px 10px;
+        /* MBA Report Styles - Professional & Clean */
+        .memo-paper {
+            background: #FFF; padding: 30px 25px; border: 1px solid #E0E0E0;
+            font-family: 'Times New Roman', "Songti SC", serif;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+            line-height: 1.5; position: relative; margin-top: 10px;
         }
-
-        .mba-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px; }
-        .mba-table th { background: #37474F; color: #fff; padding: 10px; text-align: left; font-weight: normal; }
-        .mba-table td { border-bottom: 1px solid #EEE; padding: 10px; color: #455A64; }
+        .mba-watermark {
+            position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 60px; color: rgba(0,0,0,0.02); font-weight: bold; pointer-events: none; z-index: 0;
+            white-space: nowrap; border: 4px solid rgba(0,0,0,0.02); padding: 10px;
+        }
+        .mba-header { border-bottom: 2px solid #222; padding-bottom: 12px; margin-bottom: 20px; display:flex; justify-content:space-between; align-items:flex-end; }
+        .mba-logo-text { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 700; color: #111; line-height: 1; }
+        .mba-meta { font-size: 9px; text-align: right; color: #555; line-height:1.4; font-family: 'Lato', sans-serif; }
         
-        /* 标签 */
-        .tag { display: inline-block; padding: 3px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-right: 4px; border: 1px solid transparent; }
-        .tag-med { color: #0277BD; border-color: #0277BD; background: #E1F5FE; }
-        .tag-lift { color: #2E7D32; border-color: #2E7D32; background: #E8F5E9; }
-        .tag-warn { color: #C62828; border-color: #C62828; background: #FFEBEE; }
-
-        .white-paper-link {
-            display: block; margin-top: 15px; padding: 12px; background: #ECEFF1; 
-            color: #455A64; text-align: center; border-radius: 6px; text-decoration: none; font-size: 13px;
-            border: 1px dashed #B0BEC5; transition: 0.2s;
+        .mba-section-head {
+            background: #F5F5F5; padding: 5px 10px; font-weight: 700; font-family: 'Lato', sans-serif; font-size: 10px;
+            text-transform: uppercase; margin: 25px 0 10px 0; border-left: 3px solid var(--navy-blue); letter-spacing: 1px; color: #333;
         }
-        .white-paper-link:hover { background: #CFD8DC; color: #263238; }
+        
+        .mba-table { width: 100%; border-collapse: collapse; font-size: 10px; margin-bottom: 15px; z-index: 1; position: relative; }
+        .mba-table th { text-align: left; border-bottom: 2px solid #333; padding: 6px; font-family: 'Lato', sans-serif; font-weight: 700; text-transform: uppercase; color: #333; }
+        .mba-table td { border-bottom: 1px solid #EEE; padding: 8px 6px; vertical-align: middle; color: #444; }
+        
+        /* Scoring System Visuals */
+        .score-box {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 28px; height: 28px; border-radius: 4px; 
+            font-weight: 800; font-size: 11px; color: #FFF;
+        }
+        .grade-S { background: var(--forest-green); } /* 80-90 */
+        .grade-A { background: var(--antique-gold); } /* 70-79 */
+        .grade-B { background: var(--alert-orange); } /* 60-69 */
+        .grade-F { background: var(--velvet-red); }   /* <60 */
+
+        .audit-tag {
+            display: inline-block; font-size: 9px; padding: 2px 4px; border-radius: 2px; margin-right: 4px; margin-bottom: 2px;
+        }
+        .tag-fatal { color: #B71C1C; background: #FFEBEE; border: 1px solid #EF9A9A; }
+        .tag-high { color: #E65100; background: #FFF3E0; border: 1px solid #FFCC80; }
+        .tag-safe { color: #2E7D32; background: #E8F5E9; border: 1px solid #A5D6A7; }
+
+        /* Nav */
+        .nav-orchestra {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 65px;
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(0,0,0,0.06);
+            display: flex; justify-content: space-around; align-items: center; z-index: 100;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .nav-item { flex: 1; text-align: center; color: #CCC; cursor: pointer; transition: 0.3s; position: relative; }
+        .nav-item.active { color: var(--piano-black); }
+        .nav-item.active i { transform: translateY(-2px); color: var(--antique-gold); }
+        .nav-text { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; display: block; margin-top: 4px; font-weight: 600; }
+
+        /* Toast */
+        #toast {
+            visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center;
+            border-radius: 4px; padding: 12px; position: fixed; z-index: 101; left: 50%; bottom: 80px;
+            transform: translateX(-50%); font-size: 12px; opacity: 0; transition: opacity 0.3s;
+        }
+        #toast.show { visibility: visible; opacity: 1; }
 
     </style>
 </head>
 <body>
 
-<div class="app-container">
-    <div class="mobile-header">
-        <div class="mobile-brand">SZ.RealEstate.AI <span style="font-size:11px; font-weight:normal; background:#37474F; color:#fff; padding:2px 6px; border-radius:4px;">Pro</span></div>
-        <div style="font-size:11px; color:#78909C;">资产安全 · 信托责任 · 适老</div>
+<header class="header-maestro fade-in-up">
+    <div>
+        <div class="brand-title">资产协奏曲</div>
+        <div class="brand-subtitle">Asset Symphony: Quantitative Risk Ed.</div>
     </div>
+    <div style="font-size: 18px; color: var(--antique-gold);"><i class="fas fa-chart-pie"></i></div>
+</header>
 
-    <main class="main-content">
-        <!-- I. IPA 评估 -->
-        <section id="section-0" class="movement-section active-section">
-            <h2 class="section-title">I. 财务安全边界评估 (IPA)</h2>
-            <div class="section-desc">
-                基于<strong>《深圳购房AI决策系统白皮书》</strong>的风控模型：针对临近退休或主要依赖资产性收入的购房者，系统采用“压力测试”算法，优先计算极高安全垫下的购买力。
+<main>
+    <!-- 第一乐章：序曲 (财务) -->
+    <section id="mov-1" class="movement-container active fade-in-up">
+        <div class="movement-title">I. 序曲 (Overture)</div>
+        <div class="movement-desc">能力边界与信贷窗口测算 (Capacity Stress Test)</div>
+        
+        <div style="background: #FFF; padding: 24px; border-radius: 4px; border:1px solid #EEE;">
+            <div class="input-group">
+                <label class="input-label">Core Cash (核心现金权益)</label>
+                <input type="number" id="ipa_cash" class="music-input" value="600" placeholder="CNY (万)">
             </div>
+            <div style="display: flex; gap: 20px;">
+                <div class="input-group" style="flex:1">
+                    <label class="input-label">Monthly Inflow (月入)</label>
+                    <input type="number" id="ipa_income" class="music-input" value="25000">
+                </div>
+                <div class="input-group" style="flex:1">
+                    <label class="input-label">Age (当前年龄)</label>
+                    <input type="number" id="ipa_age" class="music-input editable" value="55">
+                </div>
+            </div>
+            <button class="btn-baton" onclick="runOverture()">
+                <i class="fas fa-play"></i> 执行 IPA 压力测试
+            </button>
+        </div>
 
-            <div class="form-group">
-                <label>现金权益 (Cash Equity) <span style="color:#C62828">*</span></label>
-                <input type="number" id="ipa_cash" value="400" placeholder="包括存款、理财变现、公积金余额 (万)">
+        <div id="ipa-result" class="score-card slide-open">
+            <div class="input-label">Safe Purchasing Power (安全购买力)</div>
+            <div style="font-family:var(--font-heading); font-size:40px; line-height:1; color:var(--piano-black);">
+                <span id="val-max-price">0</span> <span style="font-size:16px">万</span>
+            </div>
+            <div style="margin-top:15px; font-size:11px; color:#555; background:#FAFAFA; padding:12px; border-radius:4px; border:1px solid #EEE;">
+                <div style="margin-bottom:6px;"><i class="fas fa-info-circle" style="color:var(--antique-gold)"></i> <strong>测算结论：</strong></div>
+                基于 <strong><span id="disp-age">55</span>岁</strong> 测算：信贷窗口仅剩 <strong><span id="val-tenure">0</span>年</strong>。
+                系统已强制冻结 <strong><span id="val-reserve">0</span>万</strong> 作为医疗备用金，此红线不可逾越。
+            </div>
+        </div>
+    </section>
+
+    <!-- 第二乐章：选筹 (常规房源) -->
+    <section id="mov-2" class="movement-container fade-in-up">
+        <div class="movement-title">II. 宣叙调 (Recitative)</div>
+        <div class="movement-desc">常规二手房源录入 (Standard Portfolio)</div>
+
+        <div style="display:flex; margin-bottom:20px; box-shadow:0 2px 10px rgba(0,0,0,0.03);">
+            <div class="btn-tab active" id="tab-0" onclick="switchProp(0)">Opus 1</div>
+            <div class="btn-tab" id="tab-1" onclick="switchProp(1)">Opus 2</div>
+            <div class="btn-tab" id="tab-2" onclick="switchProp(2)">Opus 3</div>
+        </div>
+
+        <div class="map-container">
+            <svg viewBox="0 0 320 160" class="map-svg active-map">
+                <path d="M20,60 L80,70 L90,120 L30,135 Z" class="map-area" id="area-ba" onclick="setRegion('BaoAn_Qianhai')"></path>
+                <text x="40" y="100" class="map-label">宝安/前海</text>
+                <path d="M80,70 L140,60 L150,110 L90,120 Z" class="map-area" id="area-ns" onclick="setRegion('NanShan_Core')"></path>
+                <text x="105" y="95" class="map-label">南山核心</text>
+                <path d="M140,60 L200,60 L200,110 L150,110 Z" class="map-area" id="area-ft" onclick="setRegion('FuTian_CBD')"></path>
+                <text x="160" y="90" class="map-label">福田中心</text>
+                <path d="M200,60 L250,70 L240,120 L200,110 Z" class="map-area" id="area-lh" onclick="setRegion('LuoHu')"></path>
+                <text x="215" y="100" class="map-label">罗湖</text>
+            </svg>
+            <div id="region-display" style="text-align:right; font-size:11px; color:var(--antique-gold); font-weight:bold; margin-top:5px;">请点击地图选择区域</div>
+        </div>
+
+        <div style="background:#FFF; padding:20px; border:1px solid #EEE; border-radius:4px;">
+            <div class="input-group">
+                <label class="input-label">Asset Name (资产名称)</label>
+                <input type="text" id="p_name" class="music-input" placeholder="输入小区名" onchange="saveProp()">
+            </div>
+            <div class="input-group">
+                <label class="input-label">Price (挂牌价)</label>
+                <input type="number" id="p_price" class="music-input" placeholder="万" onchange="saveProp()">
+            </div>
+            
+            <div style="border-top:1px dashed #DDD; padding-top:15px; margin-top:15px;">
+                <div class="input-group">
+                    <label class="input-label">Elevator (电梯配置)</label>
+                    <select id="p_elevator" class="music-input" style="font-size:14px;" onchange="saveProp()">
+                        <option value="yes">有电梯 (Standard)</option>
+                        <option value="no">无电梯 (Fatal Risk)</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Emergency Access (急救时间)</label>
+                    <input type="number" id="p_hospital" class="music-input" placeholder="分钟 (推荐<15min)" onchange="saveProp()">
+                </div>
+            </div>
+            
+            <button class="btn-baton" onclick="analyzeProp()">
+                <i class="fas fa-save"></i> 保存并暂存 (Save & Stage)
+            </button>
+        </div>
+    </section>
+
+    <!-- 第三乐章：法拍风控 -->
+    <section id="mov-3" class="movement-container fade-in-up">
+        <div class="movement-title">III. 华彩 (Cadenza)</div>
+        <div class="movement-desc">法拍房审计与风控引擎 (Foreclosure Audit)</div>
+
+        <div style="background:var(--navy-blue); padding:24px; color:#FFF; border-radius:4px; box-shadow:0 10px 25px rgba(38, 50, 56, 0.3);">
+            <div style="color:var(--antique-gold); font-family:var(--font-heading); font-size:18px; margin-bottom:20px; border-bottom:1px solid #546E7A; padding-bottom:10px; display:flex; justify-content:space-between;">
+                <span><i class="fas fa-gavel"></i> Foreclosure Engine</span>
+                <span style="font-size:10px; opacity:0.7; align-self:flex-end;">OPUS 4</span>
+            </div>
+            
+            <div class="input-group">
+                <label class="input-label" style="color:#B0BEC5;">Asset Name (法拍标的)</label>
+                <input type="text" id="auc_name" class="music-input" style="color:#FFF; border-bottom-color:#78909C;" placeholder="例如：南山法院拍卖01号">
             </div>
 
             <div style="display:flex; gap:15px;">
-                <div class="form-group" style="flex:1">
-                    <label>月均现金流 (元)</label>
-                    <input type="number" id="ipa_income" value="15000" placeholder="退休金/租金/工资">
+                <div class="input-group" style="flex:1">
+                    <label class="input-label" style="color:#B0BEC5;">Market Val (市价)</label>
+                    <input type="number" id="auc_market" class="music-input" style="color:#FFF; border-bottom-color:#78909C;" placeholder="1000">
                 </div>
-                <div class="form-group" style="flex:1">
-                    <label>年龄 (影响贷款年限)</label>
-                    <input type="number" id="ipa_age" value="55" style="color:var(--text-primary); font-weight:bold;">
-                </div>
-            </div>
-
-            <button class="btn btn-primary" onclick="runIPACalculation()">执行 IPA 压力测试</button>
-            
-            <div id="ipa-result-card" class="ipa-card">
-                <div style="font-size:12px; text-transform:uppercase; letter-spacing:1px; opacity:0.8;">Safe Purchasing Power</div>
-                <div class="ipa-val-big"><span id="ipa-max-price">0</span> <span style="font-size:20px;">万 (CNY)</span></div>
-                
-                <div style="margin-top:15px; display:flex; justify-content:space-between; border-top:1px solid rgba(255,255,255,0.2); padding-top:15px; font-size:13px;">
-                    <div>Equity (现金): <span id="val-cash" style="font-weight:bold;">0</span>万</div>
-                    <div>Debt (贷款): <span id="val-loan" style="font-weight:bold;">0</span>万</div>
-                </div>
-
-                <div style="margin-top:15px; padding:10px; background:rgba(0,0,0,0.2); border-radius:6px; font-size:13px; line-height:1.5;">
-                    <span style="opacity:0.7">策略建议：</span>
-                    <span id="ipa-warning-text">...</span>
+                <div class="input-group" style="flex:1">
+                    <label class="input-label" style="color:#B0BEC5;">Start Price (起拍)</label>
+                    <input type="number" id="auc_start" class="music-input" style="color:#FFF; border-bottom-color:#78909C;" placeholder="700">
                 </div>
             </div>
-        </section>
 
-        <!-- II. 房源录入 -->
-        <section id="section-1" class="movement-section">
-            <h2 class="section-title">II. 资产录入与尽职调查</h2>
-            <div class="section-desc">
-                引入<strong>“事前验尸 (Pre-Mortem)”</strong>思维。除价格外，重点评估医疗可达性（黄金急救圈）、适老化设计（无障碍）及资产流动性（变现周期）。
-            </div>
-            
-            <div style="display:flex; gap:10px; margin-bottom:20px;">
-                <button class="btn btn-outline active" id="tab-0" onclick="switchProp(0)">资产 A</button>
-                <button class="btn btn-outline" id="tab-1" onclick="switchProp(1)">资产 B</button>
-                <button class="btn btn-outline" id="tab-2" onclick="switchProp(2)">资产 C</button>
-            </div>
-
-            <div class="map-container">
-                <div style="font-size:11px; text-align:center; color:#78909C; margin-bottom:5px;">选择区域以校准“资产流动性”系数</div>
-                <svg viewBox="0 0 400 200" class="sz-map-svg">
-                    <!-- 核心区域示意 -->
-                    <path d="M150,120 L190,120 L200,170 L150,180 Z" class="district-path" onclick="selectDistrict('福田', 90)" id="map-ft"></path>
-                    <text x="175" y="150" class="district-text">福田(医疗核心)</text>
-                    <path d="M80,120 L110,90 L150,120 L150,180 L60,190 Z" class="district-path" onclick="selectDistrict('南山', 85)" id="map-ns"></path>
-                    <text x="115" y="150" class="district-text">南山(高流动)</text>
-                    <path d="M190,110 L230,110 L230,160 L200,170 Z" class="district-path" onclick="selectDistrict('罗湖', 70)" id="map-lu"></path>
-                    <text x="215" y="140" class="district-text">罗湖(配套熟)</text>
-                    <!-- 其他区域 -->
-                    <path d="M100,40 L160,40 L160,90 L110,90 Z" class="district-path" onclick="selectDistrict('龙华', 75)"></path>
-                    <path d="M20,100 L80,120 L90,150 L60,190 L10,140 Z" class="district-path" onclick="selectDistrict('宝安', 70)"></path>
-                </svg>
-            </div>
-
-            <div id="prop-form-container"></div>
-            <button class="btn btn-primary" onclick="analyzeProp()">执行多维风险扫描</button>
-            <div id="prop-analysis-result"></div>
-        </section>
-
-        <!-- III. 综合对比 -->
-        <section id="section-2" class="movement-section">
-            <h2 class="section-title">III. 决策矩阵 (MCDA)</h2>
-            <div class="section-desc">多目标决策分析：在流动性、居住舒适度与医疗安全之间寻找最优解。</div>
-            <div id="comparison-chart"></div>
-            <div style="margin-top:20px; font-size:12px; color:#90A4AE; padding:10px; background:#F5F7FA; border-radius:6px;">
-                注：评级逻辑参考白皮书“物理象限”与“医疗象限”标准。流动性评分基于区域历史成交周期 (DOM) 估算。
-            </div>
-        </section>
-
-        <!-- IV. 报告 -->
-        <section id="section-3" class="movement-section">
-            <h2 class="section-title">Fin. 投资备忘录 (Investment Memo)</h2>
-            <div class="mba-report-container">
-                <div class="mba-header">
-                    <div style="font-size:22px; font-weight:bold; color:#2C3E50;">ASSET ACQUISITION MEMO</div>
-                    <div style="font-size:11px; margin-top:5px; color:#78909C; letter-spacing:1px;">Based on Senior Liquidity Profile & Fiduciary Standards</div>
+            <div style="background:rgba(0,0,0,0.2); padding:15px; border-radius:4px; margin-top:10px;">
+                <div class="input-group">
+                    <label class="input-label" style="color:#FFCC80;">Ownership Risk (产权性质)</label>
+                    <select id="auc_type" class="music-input" style="color:#FFF; border-bottom:1px solid #FFCC80; font-size:14px;">
+                        <option value="personal">个人产权 (Personal)</option>
+                        <option value="company">公司产权 (Company) - 高税费预警</option>
+                    </select>
                 </div>
-                <div id="final-report-content">数据待录入...</div>
-            </div>
-            
-            <a href="https://docs.google.com/document/d/1olHeSYCQQb6jZfBWHJdd3WRoY3vo1V9rVyxnznXfmaA/edit?usp=drivesdk" target="_blank" class="white-paper-link">
-                📄 点击查阅：《深圳购房AI决策系统白皮书》<br>
-                <span style="font-size:11px; opacity:0.8">含：55岁用户画像解析、信托责任算法定义、风险热力图</span>
-            </a>
-            
-            <button class="btn btn-primary" style="margin-top:15px;" onclick="copyReport()">复制报告文本</button>
-        </section>
-        
-        <div style="height:30px;"></div>
-    </main>
-
-    <nav class="mobile-bottom-nav">
-        <div class="nav-tab active" onclick="navTo(0)"><div class="nav-tab-icon">I</div>能力</div>
-        <div class="nav-tab" onclick="navTo(1)"><div class="nav-tab-icon">II</div>资产</div>
-        <div class="nav-tab" onclick="navTo(2)"><div class="nav-tab-icon">III</div>对比</div>
-        <div class="nav-tab" onclick="navTo(3)"><div class="nav-tab-icon">Fin</div>报告</div>
-    </nav>
-
-</div>
-
-<script>
-// --- 核心状态 ---
-const store = {
-    ipa: { maxPrice: 0, loanTerm: 0, monthlyPay: 0, calculated: false },
-    properties: [
-        { id:0, name:'', price:0, hospitalTime:15, hasElevator:'yes', noise:'quiet', age:10, heat:50 },
-        { id:1, name:'', price:0, hospitalTime:15, hasElevator:'yes', noise:'quiet', age:10, heat:50 },
-        { id:2, name:'', price:0, hospitalTime:15, hasElevator:'yes', noise:'quiet', age:10, heat:50 }
-    ],
-    currIdx: 0
-};
-
-function navTo(index) {
-    document.querySelectorAll('.movement-section').forEach(el => el.style.display = 'none');
-    document.getElementById('section-' + index).style.display = 'block';
-    
-    document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.nav-tab')[index].classList.add('active');
-    
-    window.scrollTo(0,0);
-    
-    if(index === 2) renderComparison();
-    if(index === 3) generateReport();
-}
-
-// --- I. IPA 算法 (适老风控版) ---
-function runIPACalculation() {
-    const cash = parseFloat(document.getElementById('ipa_cash').value);
-    const income = parseFloat(document.getElementById('ipa_income').value);
-    const age = parseFloat(document.getElementById('ipa_age').value);
-
-    if(!cash) { alert("请输入核心资本(现金)"); return; }
-
-    // 1. 贷款年限计算 (严控)
-    // 依据白皮书3.1.1章节：女性借款人年龄限制，通常 Max Age 70
-    let maxTenure = Math.max(0, 70 - age);
-    
-    // 2. 偿债能力 (TDSR)
-    // 针对临退休人群，风控模型建议月供不超过收入的 45%
-    let maxMonthly = income * 0.45; 
-    let maxLoan = 0;
-    
-    if(maxTenure > 0 && maxMonthly > 0) {
-        let r = 3.2 / 100 / 12; // 假设利率
-        let n = maxTenure * 12;
-        maxLoan = (maxMonthly * (1 - Math.pow(1+r, -n))) / r;
-        maxLoan = maxLoan / 10000; 
-    }
-
-    // 3. 购买力上限 (短板原理)
-    let capLiquidity = cash + maxLoan; // 资金能力
-    let capRegulatory = cash / 0.3; // 首付能力 (LTV 70% Max)
-    
-    let finalMax = Math.min(capLiquidity, capRegulatory);
-    let actualLoan = Math.max(0, finalMax - cash);
-
-    store.ipa = {
-        maxPrice: finalMax,
-        cashPart: cash,
-        loanPart: actualLoan,
-        loanTerm: maxTenure,
-        calculated: true
-    };
-
-    // UI 渲染
-    document.getElementById('ipa-result-card').style.display = 'block';
-    document.getElementById('ipa-max-price').innerText = finalMax.toFixed(0);
-    document.getElementById('val-cash').innerText = cash.toFixed(0);
-    document.getElementById('val-loan').innerText = actualLoan.toFixed(0);
-
-    let warnText = "";
-    if(maxTenure <= 5) {
-        warnText = `贷款窗口期极短 (${maxTenure}年)，杠杆效应微弱。建议采用全款或高首付策略，避免现金流断裂。`;
-    } else if (actualLoan > 0) {
-        warnText = `理论可贷 ${maxTenure} 年。基于适老风控原则，请务必保留 6-12 个月的月供储备金，勿满仓操作。`;
-    } else {
-        warnText = "基于当前年龄/收入模型，全款购房为最优解，无负债风险。";
-    }
-    document.getElementById('ipa-warning-text').innerText = warnText;
-}
-
-// --- II. 房源录入 (专业维度) ---
-function switchProp(idx) {
-    store.currIdx = idx;
-    renderPropForm();
-    [0,1,2].forEach(i => {
-        const btn = document.getElementById('tab-'+i);
-        if(i===idx) btn.classList.add('active'); else btn.classList.remove('active');
-    });
-}
-
-function selectDistrict(name, heat) {
-    store.properties[store.currIdx].name = name;
-    store.properties[store.currIdx].heat = heat; 
-    renderPropForm();
-}
-
-function renderPropForm() {
-    const p = store.properties[store.currIdx];
-    document.getElementById('prop-form-container').innerHTML = `
-        <div class="form-group">
-            <label>资产名称/区域</label>
-            <input type="text" value="${p.name}" onchange="updateP('name', this.value)" placeholder="点击地图选择">
-        </div>
-        <div class="form-group">
-            <label>挂牌价格 (万)</label>
-            <input type="number" value="${p.price||''}" onchange="updateP('price', this.value)">
-        </div>
-        
-        <div style="background:#F5F7FA; padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid #ECEFF1;">
-            <label style="color:#2C3E50; font-size:12px;">适老化核心指标 (Aging-Friendly Metrics)</label>
-            <div style="display:flex; gap:10px; margin-bottom:10px;">
-                <div style="flex:1">
-                    <label style="font-size:11px;">黄金急救圈 (分)</label>
-                    <input type="number" value="${p.hospitalTime}" onchange="updateP('hospitalTime', this.value)" placeholder="到三甲时间">
-                </div>
-                <div style="flex:1">
-                    <label style="font-size:11px;">垂直通行 (电梯)</label>
-                    <select onchange="updateP('hasElevator', this.value)">
-                        <option value="yes" ${p.hasElevator=='yes'?'selected':''}>具备 (Yes)</option>
-                        <option value="no" ${p.hasElevator=='no'?'selected':''}>缺失 (No)</option>
+                <div class="input-group" style="margin-bottom:0;">
+                    <label class="input-label" style="color:#FFCC80;">Occupancy Risk (占用情况)</label>
+                    <select id="auc_occupy" class="music-input" style="color:#FFF; border-bottom:1px solid #FFCC80; font-size:14px;">
+                        <option value="empty">空置 (Vacant) - 安全</option>
+                        <option value="tenant">有租约 (Tenanted) - 腾退难</option>
+                        <option value="owner">自住 (Occupied) - 腾退难</option>
                     </select>
                 </div>
             </div>
-            <div>
-                <label style="font-size:11px;">声环境质量</label>
-                <select onchange="updateP('noise', this.value)">
-                    <option value="quiet" ${p.noise=='quiet'?'selected':''}>I类标准 (安静)</option>
-                    <option value="noisy" ${p.noise=='noisy'?'selected':''}>超标 (临街/噪音)</option>
-                </select>
+
+            <div style="margin:20px 0; font-size:11px; color:#EF9A9A; padding:10px; border:1px dashed #EF9A9A; border-radius:4px;">
+                <label style="display:flex; align-items:center; cursor:pointer;">
+                    <input type="checkbox" id="risk_criminal" style="margin-right:10px; transform:scale(1.2);"> 
+                    <strong>涉及刑事查封 (Criminal Seizure)</strong>
+                </label>
             </div>
+
+            <button class="btn-baton" style="background:var(--antique-gold); border-color:var(--antique-gold); color:var(--navy-blue);" onclick="calcSafeBid()">
+                <i class="fas fa-search-dollar"></i> 执行审计 (Run Audit)
+            </button>
         </div>
 
-        <div class="form-group">
-            <label>流动性指标 (Liquidity Metrics)</label>
-            <div style="display:flex; gap:10px;">
-                <div style="flex:1">
-                    <label style="font-size:11px;">资产楼龄 (年)</label>
-                    <input type="number" value="${p.age}" onchange="updateP('age', this.value)">
+        <div id="auc-result" class="slide-open" style="margin-top:10px;">
+            <div style="background:#FFF; border:1px solid #EEE; padding:20px; border-top:4px solid var(--navy-blue);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <span style="font-size:12px; font-weight:bold; color:var(--warm-grey);">NET VALUE (还原净值)</span>
+                    <span id="auc-risk-badge" class="rating-badge">ANALYZING</span>
                 </div>
-                <div style="flex:1">
-                    <label style="font-size:11px;">区域换手热度</label>
-                    <input 
+                
+                <div style="font-family:var(--font-heading); font-size:36px; color:var(--piano-black); line-height:1; display:flex; align-items:baseline;">
+                    <span id="nv-final">0</span> <span style="font-size:16px; margin-left:4px;">万</span>
+                    <span style="font-size:12px; color:#999; font-family:var(--font-body); margin-left:auto;">
+                        倒挂率: <span id="nv-spread">0</span>%
+                    </span>
+                </div>
+                <div style="font-size:11px; color:#D32F2F; margin-top:8px; padding-bottom:12px; border-bottom:1px solid #EEE;">
+                    <i class="fas fa-exclamation-circle"></i> 含隐形债务: <span id="nv-debt">0</span>万 (税费+腾退风险金)
+                </div>
+
+                <!-- 审计详情输出区域 -->
+                <div id="auc-audit-log" style="margin-top:15px; font-size:11px;"></div>
+
+                <div style="margin-top:20px;">
+                    <button class="btn-baton secondary" onclick="saveAuctionToPortfolio()">
+                        <i class="fas fa-folder-plus"></i> 录入报告矩阵 (Add to Matrix)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 第四乐章：终章报告 -->
+    <section id="mov-4" class="movement-container fade-in-up">
+        <div class="movement-title">IV. 尾声 (Finale)</div>
+        <div class="movement-desc">投资决策备忘录 (IC Memo)</div>
+
+        <div class="memo-paper" id="final-report">
+            <div class="mba-watermark">CONFIDENTIAL</div>
+            
+            <div class="mba-header">
+                <div>
+                    <div class="mba-logo-text">INVESTMENT<br>MEMORANDUM</div>
+                </div>
+                <div class="mba-meta">
+                    <strong>TO:</strong> IC COMMITTEE<br>
+                    <strong>DATE:</strong> <span id="rpt-date">2026</span><br>
+                    <strong>RE:</strong> SCORING MATRIX
+                </div>
+            </div>
+
+            <div class="mba-section-head">1. Executive Summary (执行摘要)</div>
+            <p style="font-size:11px; text-align:justify; color:#444;">
+                根据投资者画像（<span id="rpt-age">--</span>岁），系统测算的财务安全边界为 <strong><span id="rpt-limit">--</span>万</strong>。
+                本报告采用 <strong>Max-90 量化评分体系</strong>（满分90分），旨在客观拉开资产差距。任何低于 60 分的资产将被定义为 <span style="color:#D32F2F; font-weight:bold;">TOXIC (有毒)</span> 并不予推荐。
+            </p>
+
+            <div class="mba-section-head">2. Quantitative Scoring Matrix (评分矩阵)</div>
+            <table class="mba-table">
+                <thead>
+                    <tr>
+                        <th width="35%">Asset / Status</th>
+                        <th width="20%">Economics</th>
+                        <th width="30%">Risk Audit</th>
+                        <th width="15%" style="text-align:center;">Score</th>
+                    </tr>
+                </thead>
+                <tbody id="rpt-table-body">
+                    <tr><td colspan="4" style="text-align:center; color:#999; padding:20px;">等待数据录入...</td></tr>
+                </tbody>
+            </table>
+            <div style="font-size:9px; color:#888; margin-top:5px; text-align:right;">
+                * Scoring Cap: 90 Points. Pass Line: 60 Points.
+            </div>
+
+            <div class="mba-section-head">3. Strategic Verdict (决策建议)</div>
+            <div style="background:#F1F8E9; padding:15px; border-radius:2px; font-size:11px; border-left:4px solid var(--forest-green); color:#33691E;">
+                <strong style="text-transform:uppercase;">Advisor's Note:</strong><br>
+                <span id="rpt-advice">分析中...</span>
+            </div>
+        </div>
+        
+        <button class="btn-baton" onclick="window.print()">
+            <i class="fas fa-file-pdf"></i> 导出完整报告 (Export PDF)
+        </button>
+    </section>
+</main>
+
+<nav class="nav-orchestra">
+    <div class="nav-item active" onclick="nav(1, this)"><i class="fas fa-coins"></i><span class="nav-text">I. 序曲</span></div>
+    <div class="nav-item" onclick="nav(2, this)"><i class="fas fa-home"></i><span class="nav-text">II. 选筹</span></div>
+    <div class="nav-item" onclick="nav(3, this)"><i class="fas fa-gavel"></i><span class="nav-text">III. 法拍</span></div>
+    <div class="nav-item" onclick="nav(4, this)"><i class="fas fa-file-contract"></i><span class="nav-text">IV. 报告</span></div>
+</nav>
+
+<div id="toast">Saved</div>
+
+<script>
+// --- Symphony Engine (Core Logic) ---
+
+const store = {
+    ipa: { maxPrice: 0, reserve: 0, age: 55, calculated: false },
+    props: [
+        { name: '', price: null, region: '', elevator: 'yes', hospital: 10, type: 'standard' },
+        { name: '', price: null, region: '', elevator: 'yes', hospital: 10, type: 'standard' },
+        { name: '', price: null, region: '', elevator: 'yes', hospital: 10, type: 'standard' }
+    ],
+    auctionProp: null, // Opus 4
+    activeProp: 0
+};
+
+// Utilities
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.innerText = msg;
+    t.className = "show";
+    setTimeout(() => t.className = t.className.replace("show", ""), 2500);
+}
+
+// Navigation
+function nav(id, el) {
+    document.querySelectorAll('.movement-container').forEach(e => { 
+        e.classList.remove('active'); 
+        e.style.opacity = 0; 
+    });
+    
+    const target = document.getElementById('mov-' + id);
+    target.classList.add('active');
+    void target.offsetWidth; target.style.opacity = 1;
+
+    document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
+    el.classList.add('active');
+    
+    if(id === 4) generateReport();
+    window.scrollTo(0,0);
+}
+
+// I. Overture
+function runOverture() {
+    const cash = parseFloat(document.getElementById('ipa_cash').value) || 0;
+    const income = parseFloat(document.getElementById('ipa_income').value) || 0;
+    let age = parseFloat(document.getElementById('ipa_age').value);
+    
+    if(!age || age < 18) age = 55;
+    
+    let loanYears = Math.max(0, 70 - age);
+    let maxMonthlyPay = income * 0.45; 
+    
+    let loanAmount = 0;
+    if (loanYears > 0) {
+        let rate = 0.032 / 12; 
+        let months = loanYears * 12;
+        loanAmount = (maxMonthlyPay / rate) * (1 - Math.pow(1 + rate, -months)) / 10000;
+    }
+
+    let maxLTVPrice = cash / 0.40; // 40% down strict
+    let maxIncomePrice = cash + loanAmount;
+    let safePrice = Math.min(maxLTVPrice, maxIncomePrice);
+    
+    store.ipa = { maxPrice: safePrice, reserve: safePrice * 0.1, age: age, calculated: true };
+
+    const resDiv = document.getElementById('ipa-result');
+    resDiv.classList.add('show');
+    document.getElementById('val-max-price').innerText = safePrice.toFixed(0);
+    document.getElementById('val-tenure').innerText = loanYears;
+    document.getElementById('val-reserve').innerText = (safePrice * 0.1).toFixed(0);
+    document.getElementById('disp-age').innerText = age;
+}
+
+// II. Selection
+function switchProp(idx) {
+    store.activeProp = idx;
+    [0,1,2].forEach(i => document.getElementById('tab-'+i).classList.toggle('active', i === idx));
+    
+    const p = store.props[idx];
+    document.getElementById('p_name').value = p.name;
+    document.getElementById('p_price').value = p.price || '';
+    document.getElementById('p_elevator').value = p.elevator;
+    document.getElementById('p_hospital').value = p.hospital;
+    
+    updateMap(p.region);
+}
+
+function updateMap(region) {
+    document.querySelectorAll('.map-area').forEach(el => el.classList.remove('selected'));
+    const label = document.getElementById('region-display');
+    if(!region) { label.innerText = "请点击地图选择区域"; return; }
+    
+    let mapId = '', name = '';
+    if(region === 'BaoAn_Qianhai') { mapId = 'area-ba'; name = "宝安/前海 (Growth)"; }
+    else if(region === 'NanShan_Core') { mapId = 'area-ns'; name = "南山核心 (Prime)"; }
+    else if(region === 'FuTian_CBD') { mapId = 'area-ft'; name = "福田中心 (Liquid)"; }
+    else if(region === 'LuoHu') { mapId = 'area-lh'; name = "罗湖 (Lagging)"; }
+    
+    if(mapId) document.getElementById(mapId).classList.add('selected');
+    label.innerText = name;
+}
+
+function setRegion(reg) {
+    store.props[store.activeProp].region = reg;
+    updateMap(reg);
+    saveProp();
+}
+
+function saveProp() {
+    const p = store.props[store.activeProp];
+    p.name = document.getElementById('p_name').value;
+    p.price = parseFloat(document.getElementById('p_price').value);
+    p.elevator = document.getElementById('p_elevator').value;
+    p.hospital = parseFloat(document.getElementById('p_hospital').value);
+    p.type = 'standard';
+}
+
+function analyzeProp() {
+    if(!store.ipa.calculated) { showToast("请先在乐章 I 完成压力测试"); return; }
+    showToast("已保存并暂存至报告");
+}
+
+// III. Foreclosure Audit (Core Logic Upgrade)
+function calcSafeBid() {
+    const market = parseFloat(document.getElementById('auc_market').value);
+    const startPrice = parseFloat(document.getElementById('auc_start').value) || (market * 0.7);
+    
+    if(!market) { showToast("请输入市场价"); return; }
+    
+    const aucName = document.getElementById('auc_name').value || "未命名法拍资产";
+    const type = document.getElementById('auc_type').value;
+    const occupy = document.getElementById('auc_occupy').value;
+    const isCriminal = document.getElementById('risk_criminal').checked;
+    
+    // 1. Calculate Economics
+    // Base Liquidity Discount: 15% off market value immediately
+    let base = market * 0.85;
+    
+    // Tax Calculation
+    let taxCost = type === 'company' ? market * 0.45 : market * 0.08; 
+    
+    // Eviction & Time Cost
+    let evictCost = 0;
+    if(occupy === 'tenant') evictCost = 15; // Legal fees + time value
+    if(occupy === 'owner') evictCost = 10;
+    if(isCriminal) evictCost += 30; // Massive uncertainty cost
+    
+    let safeBid = base - taxCost - evictCost;
+    let totalHiddenDebt = taxCost + evictCost;
+    let spread = ((market - startPrice) / market * 100).toFixed(1);
+
+    // 2. Risk Audit Output
+    let auditLog = [];
+    
+    // Tax Audit
+    if(type === 'company') {
+        auditLog.push({ tag: "FATAL", text: "公司产权：土地增值税极高，丧失投资价值" });
+    } else {
+        auditLog.push({ tag: "SAFE", text: "个人产权：税费可控" });
+    }
+    
+    // Occupancy Audit
+    if(occupy === 'tenant') {
+        auditLog.push({ tag: "HIGH", text: "带租约：买卖不破租赁，腾退周期 >12个月" });
+    } else if(occupy === 'owner') {
+        auditLog.push({ tag: "MED", text: "有人占用：需预留腾退成本" });
+    } else {
+        auditLog.push({ tag: "SAFE", text: "空置状态：可立即收房" });
+    }
+    
+    // Legal Audit
+    if(isCriminal) {
+        auditLog.push({ tag: "FATAL", text: "刑事查封：解封不可控，禁止触碰" });
+    }
+
+    const tempAuction = {
+        name: aucName, 
+        price: startPrice, // Starting
+        safeBid: safeBid,  // Calculated limit
+        marketValue: market,
+        type: 'auction',
+        risks: { type, occupy, isCriminal, totalHiddenDebt },
+        auditLog: auditLog
+    };
+    
+    // 3. Render UI
+    const resDiv = document.getElementById('auc-result');
+    resDiv.classList.add('show');
+    
+    document.getElementById('nv-final').innerText = safeBid.toFixed(0);
+    document.getElementById('nv-debt').innerText = totalHiddenDebt.toFixed(0);
+    document.getElementById('nv-spread').innerText = spread;
+    
+    const logContainer = document.getElementById('auc-audit-log');
+    let html = "";
+    auditLog.forEach(item => {
+        let colorClass = item.tag === 'FATAL' ? 'tag-fatal' : (item.tag === 'HIGH' ? 'tag-high' : 'tag-safe');
+        html += `<div style="margin-bottom:6px;"><span class="audit-tag ${colorClass}">${item.tag}</span> ${item.text}</div>`;
+    });
+    logContainer.innerHTML = html;
+    
+    const badge = document.getElementById('auc-risk-badge');
+    if(auditLog.some(a => a.tag === 'FATAL')) {
+        badge.style.background = 'var(--velvet-red)'; badge.innerText = "DO NOT BID";
+    } else if (auditLog.some(a => a.tag === 'HIGH')) {
+        badge.style.background = '#F57C00'; badge.innerText = "HIGH RISK";
+    } else {
+        badge.style.background = 'var(--forest-green)'; badge.innerText = "INVESTABLE";
+    }
+    
+    window.currentAuctionCalc = tempAuction;
+}
+
+function saveAuctionToPortfolio() {
+    if(window.currentAuctionCalc) {
+        store.auctionProp = window.currentAuctionCalc;
+        showToast("已录入评分矩阵 (Opus 4)");
+    } else {
+        showToast("请先执行审计");
+    }
+}
+
+// --- IV. Scoring Matrix (90-Point System) ---
+
+function calculateScore(p) {
+    // CAP AT 90. Perfect 100 doesn't exist in investment.
+    let score = 90; 
+    let auditSummary = [];
+
+    if (p.type === 'standard') {
+        // --- Standard Real Estate ---
+        
+        // 1. Elevator (The "Old Age" Killer)
+        if (p.elevator === 'no') {
+            score -= 40; // Immediate Fail (<60)
+            auditSummary.push({tag:'FATAL', text:'无电梯'});
+        }
+
+        // 2. Budget (Financial Stress)
+        if (store.ipa.calculated && p.price > store.ipa.maxPrice) {
+            let over = p.price - store.ipa.maxPrice;
+            score -= 20;
+            auditSummary.push({tag:'HIGH', text:`超预算${over.toFixed(0)}w`});
+        }
+        
+        // 3. Region (Liquidity)
+        if (p.region === 'LuoHu') {
+            score -= 15; // Low liquidity penalty
+            auditSummary.push({tag:'MED', text:'弱流动性片区'});
+        } else if (p.region === 'BaoAn_Qianhai') {
+             score -= 5; // Volatility risk
+        }
+        
+        // 4. Hospital
+        if(p.hospital > 15) {
+             score -= 5;
+             auditSummary.push({tag:'MED', text:`急救>${p.hospital}m`});
+        }
+
+    } else if (p.type === 'auction') {
+        // --- Auction Properties ---
+        score = 85; // Base lower for legal uncertainty
+
+        // 1. Profit Spread (Greed vs Safety)
+        let spreadPercent = (p.marketValue - p.price) / p.marketValue;
+        if (spreadPercent > 0.3) score += 5; // Maxes out at 90
+        else if (spreadPercent < 0.2) score -= 10; // Not worth the risk
+        
+        // 2. Legal Risks (The Heavy Hitters)
+        if (p.risks.isCriminal) {
+            score -= 50; // Fatal
+        }
+        if (p.risks.type === 'company') {
+            score -= 30; // High Tax
+        }
+        if (p.risks.occupy !== 'empty') {
+            score -= 15; // Eviction headache
+        }
+        
+        // Map audit logs to summary
+        p.auditLog.forEach(l => {
+            if(l.tag !== 'SAFE') auditSummary.push({tag:l.tag, text:l.text.split('：')[0]});
+        });
+    }
+    
+    // Hard clamp 0-90
+    return { 
+        score: Math.max(0, Math.min(90, score)), 
+        audit: auditSummary 
+    };
+}
+
+function generateReport() {
+    document.getElementById('rpt-date').innerText = new Date().toLocaleDateString();
+    document.getElementById('rpt-age').innerText = store.ipa.age;
+    document.getElementById('rpt-limit').innerText = store.ipa.maxPrice.toFixed(0);
+    
+    const tbody = document.getElementById('rpt-table-body');
+    let rows = "";
+    
+    // Merge props
+    const allProps = [...store.props];
+    if(store.auctionProp) allProps.push(store.auctionProp);
+    
+    let validCount = 0;
+    let bestScore = 0;
+
+    allProps.forEach((p, idx) => {
+        // Skip empty standard props
+        if(p.type === 'standard' && !p.name && !p.price) return;
+        
+        let label = p.type === 'standard' ? `Opus ${idx+1}` : `Opus 4 (法拍)`;
+        let result = calculateScore(p);
+        let s = result.score;
+        let grade = s >= 80 ? 'S' : (s >= 70 ? 'A' : (s >= 60 ? 'B' : 'F'));
+        
+        if(s > bestScore) bestScore = s;
+        validCount++;
+
+        // Render Audit Tags
+        let auditHtml = "";
+        if(result.audit.length === 0) {
+            auditHtml = `<span class="audit-tag tag-safe">CLEAN</span>`;
+        } else {
+            result.audit.forEach(a => {
+                let c = a.tag==='FATAL'?'tag-fatal':(a.tag==='HIGH'?'tag-high':'tag-safe');
+                auditHtml += `<span class="audit-tag ${c}">${a.text}</span>`;
+            });
+        }
+        
+        // Render Economics
+        let econHtml = "";
+        if(p.type === 'standard') {
+            econHtml = `<div style="font-weight:bold;">${p.price?p.price.toFixed(0):0}w</div><div style="font-size:9px;color:#999;">挂牌价</div>`;
+        } else {
+            econHtml = `<div style="font-weight:bold;">${p.price.toFixed(0)}w</div><div style="font-size:9px;color:#999;">起拍 (市价${p.marketValue}w)</div>`;
+        }
+
+        rows += `
+            <tr>
+                <td>
+                    <div style="font-weight:bold; color:#222; font-size:11px;">${p.name || '未命名资产'}</div>
+                    <div style="font-size:9px; color:#888;">${label} ${p.type==='auction'?'(Auction)':''}</div>
+                </td>
+                <td>${econHtml}</td>
+                <td>${auditHtml}</td>
+                <td style="text-align:center;">
+                    <div class="score-box grade-${grade}">${s}</div>
+                </td>
+            </tr>
+        `;
+    });
+    
+    if(rows === "") rows = `<tr><td colspan="4" style="text-align:center; padding:20px; font-style:italic; font-size:10px;">暂无数据</td></tr>`;
+    tbody.innerHTML = rows;
+    
+    // Strategic Verdict
+    const adviceBox = document.getElementById('rpt-advice');
+    if(validCount === 0) {
+        adviceBox.innerText = "请先在 II(选筹) 或 III(法拍) 中录入资产数据。";
+    } else if (bestScore < 60) {
+        adviceBox.innerHTML = "<span style='color:#B71C1C; font-weight:bold;'>全员淘汰 (REJECT ALL)。</span> 当前所有资产评分均低于 60 分，存在致命硬伤（如无电梯、高税费、刑案）。建议空仓观望。";
+        adviceBox.parentElement.style.borderLeftColor = 'var(--velvet-red)';
+        adviceBox.parentElement.style.background = '#FFEBEE';
+        adviceBox.parentElement.style.color = '#B71C1C';
+    } else if (bestScore >= 80) {
+        adviceBox.innerHTML = "发现优质资产（S级）。建议优先锁定评分最高的项目，并尽快安排实地勘察。";
+    } else {
+        adviceBox.innerHTML = "资产资质平庸（A/B级）。虽无致命硬伤，但性价比一般。建议尝试议价或继续寻找。";
+    }
+}
+</script>
+
+</body>
+</html>
