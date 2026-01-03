@@ -80,6 +80,7 @@
         }
         .music-input:focus { border-bottom-color: var(--antique-gold); outline: none; }
         .music-input::placeholder { color: #DDD; }
+        .music-input.editable { color: var(--antique-gold); border-bottom: 1px dashed var(--antique-gold); }
 
         /* Buttons */
         .btn-baton {
@@ -194,14 +195,18 @@
                 <label class="input-label">Core Cash (核心现金权益)</label>
                 <input type="number" id="ipa_cash" class="music-input" value="800" placeholder="CNY (万)">
             </div>
+            <div class="input-group">
+                <label class="input-label">Monthly Inflow (月入)</label>
+                <input type="number" id="ipa_income" class="music-input" value="35000">
+            </div>
             <div style="display: flex; gap: 20px;">
-                <div class="input-group" style="flex:1">
-                    <label class="input-label">Monthly Inflow (月入)</label>
-                    <input type="number" id="ipa_income" class="music-input" value="35000">
-                </div>
                 <div class="input-group" style="flex:1">
                     <label class="input-label">Age (当前年龄)</label>
                     <input type="number" id="ipa_age" class="music-input editable" value="45">
+                </div>
+                <div class="input-group" style="flex:1">
+                    <label class="input-label">Rate (房贷利率 %)</label>
+                    <input type="number" id="ipa_rate" class="music-input editable" value="3.15" step="0.05">
                 </div>
             </div>
             <button class="btn-baton" onclick="runOverture()">
@@ -521,7 +526,8 @@ function runOverture() {
     const cash = parseFloat(document.getElementById('ipa_cash').value) || 0;
     const income = parseFloat(document.getElementById('ipa_income').value) || 0;
     let age = parseFloat(document.getElementById('ipa_age').value);
-    
+    let annualRate = parseFloat(document.getElementById('ipa_rate').value) || 3.15; // New: Rate Input
+
     if(!age || age < 18) age = 45;
     
     let loanYears = Math.max(0, 70 - age);
@@ -529,7 +535,7 @@ function runOverture() {
     
     let loanAmount = 0;
     if (loanYears > 0) {
-        let rate = 0.032 / 12; 
+        let rate = (annualRate / 100) / 12; // New: Dynamic Rate
         let months = loanYears * 12;
         loanAmount = (maxMonthlyPay / rate) * (1 - Math.pow(1 + rate, -months)) / 10000;
     }
